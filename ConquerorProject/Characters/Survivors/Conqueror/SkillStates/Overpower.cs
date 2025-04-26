@@ -11,7 +11,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         public override void OnEnter()
         {
-            hitboxGroupName = "MeleeHitbox";
+            hitboxGroupName = "SwordGroup";
 
             damageType = DamageType.Generic;
             damageCoefficient = ConquerorStaticValues.swingDamageCoefficient;
@@ -19,7 +19,6 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             pushForce = 300f;
             bonusForce = Vector3.zero;
             baseDuration = 1f;
-
 
             //0-1 multiplier of baseduration, used to time when the hitbox is out (usually based on the run time of the animation)
             //for example, if attackStartPercentTime is 0.5, the attack will start hitting halfway through the ability. if baseduration is 3 seconds, the attack will start happening at 1.5 seconds
@@ -34,6 +33,12 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             hitSoundString = "";
             muzzleString = swingIndex % 2 == 0 ? "SwingMuzzle1" : "SwingMuzzle2";
             playbackRateParam = "Swing.playbackRate";
+
+            if (swingIndex == 2)
+            {
+                Log.Debug("Trigger Bleed+Slayer");
+                attack.damageType.damageType = RoR2.DamageType.BleedOnHit | RoR2.DamageType.BonusToLowHealth;
+            }
 
             base.OnEnter();
         }

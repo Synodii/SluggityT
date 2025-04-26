@@ -31,19 +31,22 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         public static string beginSoundString = "Play_imp_attack_blink";
 
         private float chargeDuration;
-        private float baseChargeDuration = 1.25f;
+        private float baseChargeDuration = 1.2f;
         public float charge;
+        private bool isCharged;
         private float baseMaxSecondaryStock;
         private float secondaryStock;
 
 
         public override void OnEnter()
         {
+            this.isCharged = false;
+
             base.OnEnter();
             this.aimSphere = UnityEngine.Object.Instantiate<GameObject>(ArrowRain.areaIndicatorPrefab);
-            
+
             this.chargeDuration = this.baseChargeDuration / this.attackSpeedStat;
-            
+
             //AkSoundEngine.PostEvent("Judgement", base.gameObject);
             Util.PlaySound("Play_imp_attack_blink", base.gameObject);
             //base.PlayAnimation("FullBody, Override", BackflipState.BackflipStateHash, BackflipState.BackflipParamHash, BackflipState.duration);
@@ -105,10 +108,20 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 base.characterMotor.velocity.y = 10f;
                 this.outer.SetNextStateToMain();
             }
-
             if (base.characterMotor)
             {
                 base.characterMotor.velocity = Vector3.zero;
+            }
+
+            ChargedSoundplayed();
+        }
+
+        private void ChargedSoundplayed()
+        {
+            if (!this.isCharged && this.charge >= this.chargeDuration)
+            {
+                this.isCharged = true;
+                Util.PlaySound("Play_imp_attack_tell", base.gameObject);
             }
         }
 
@@ -118,7 +131,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             EntityState.Destroy(this.aimSphere.gameObject);
             //EntityState.Destroy(this.aimSphere2.gameObject);
 
-            if (this.charge > this.chargeDuration)
+            if (this.charge >= this.chargeDuration)
             {
                 if (NetworkServer.active && healthComponent)
                 {
@@ -128,7 +141,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                         position = characterBody.corePosition,
                         attacker = null,
                         inflictor = null,
-                        damageType = DamageType.NonLethal | DamageType.BypassArmor | DamageType.BleedOnHit,
+                        damageType = DamageType.NonLethal | DamageType.BypassArmor,
                         procCoefficient = 1f
                     });
                 }
@@ -144,6 +157,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     }
                 }
             }
+
 
                 bleedblast = new BlastAttack();
             bleedblast.radius = 8f;
@@ -167,7 +181,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             pullblast.inflictor = gameObject;
             pullblast.teamIndex = TeamIndex.Player;
             pullblast.procCoefficient = 0f;
-            pullblast.baseForce = -1500;
+            pullblast.baseForce = -2000;
             pullblast.canRejectForce = false;
             pullblast.falloffModel = BlastAttack.FalloffModel.None;
             pullblast.baseDamage = pullblastDamageCoefficient;

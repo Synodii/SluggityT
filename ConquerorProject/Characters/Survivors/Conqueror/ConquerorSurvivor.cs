@@ -14,7 +14,7 @@ namespace ConquerorMod.Survivors.Conqueror
     public class ConquerorSurvivor : SurvivorBase<ConquerorSurvivor>
     {
         //used to load the assetbundle for this character. must be unique
-        public override string assetBundleName => "myassetbundle"; //if you do not change this, you are giving permission to deprecate the mod
+        public override string assetBundleName => "conqdelaassets"; //if you do not change this, you are giving permission to deprecate the mod
 
         //the name of the prefab we will create. conventionally ending in "Body". must be unique
         public override string bodyName => "ConquerorBody"; //if you do not change this, you get the point by now
@@ -252,7 +252,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 activationStateMachineName = "Weapon2",
                 interruptPriority = EntityStates.InterruptPriority.Skill,
 
-                baseRechargeInterval = 1f,
+                baseRechargeInterval = 13f,
                 baseMaxStock = 3,
 
                 rechargeStock = 1,
