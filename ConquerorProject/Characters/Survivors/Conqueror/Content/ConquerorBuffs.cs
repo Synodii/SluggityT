@@ -7,6 +7,7 @@ namespace ConquerorMod.Survivors.Conqueror
     {
         public static BuffDef frenzyBuff;
         public static BuffDef intimidateDebuff;
+        public static BuffDef backpackTrackerHiddenBuff;
 
 
         public static void Init(AssetBundle assetBundle)
@@ -23,6 +24,11 @@ namespace ConquerorMod.Survivors.Conqueror
                 false,
                 true);
 
+            backpackTrackerHiddenBuff = Modules.Content.CreateAndAddBuff("ConquerorIntimidatedBuff",
+                LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite,
+                Color.green,
+                false,
+                true);
         }
     }
 }

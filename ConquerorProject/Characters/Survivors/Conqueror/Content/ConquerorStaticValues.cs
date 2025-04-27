@@ -6,7 +6,9 @@ namespace ConquerorMod.Survivors.Conqueror
     {
         public const float swingDamageCoefficient = 2.4f;
 
-        public const float warpDamageCoefficient = 1.8f;
+        public const float warpDamageCoefficient = 2.5f;
+
+        public const float chargedwarpDamageCoefficient = 5f;
 
         public const float offenceeyeDamageCoefficient = 3f;
 

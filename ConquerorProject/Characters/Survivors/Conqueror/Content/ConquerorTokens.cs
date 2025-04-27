@@ -42,7 +42,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Passive
             Language.Add(prefix + "PASSIVE_NAME", "Scavenge");
-            Language.Add(prefix + "PASSIVE_DESCRIPTION", "While Special is active, kills within its radius refresh stocks of your secondary.");
+            Language.Add(prefix + "PASSIVE_DESCRIPTION", "While Special is active, kills while within its radius refresh stocks of your secondary.");
             #endregion
 
             #region Primary
@@ -52,12 +52,12 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Secondary
             Language.Add(prefix + "SECONDARY_CONSUMEEYE_NAME", "Imbibe");
-            Language.Add(prefix + "SECONDARY_CONSUMEEYE_DESCRIPTION", Tokens.agilePrefix + $"Regenerative. Consume an Imp eye to recover <style=cIsHealing>15% max health</style>. Becomes Smother while Special is active.");
+            Language.Add(prefix + "SECONDARY_CONSUMEEYE_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>. <style=cIsUtility>Becomes Smother while Special is active.</style>");
             #endregion
 
             #region Utility
             Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
-            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", "Roll a short distance, gaining <style=cIsUtility>300 armor</style>. <style=cIsUtility>You cannot be hit during the roll.</style>");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, it <style=cIsUtility>cleanses debuffs</style> and deals <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> and <style=cIsUtility>pulling</style> enemies. When fully charged, incur <style=cIsHealth>30% health</style> in exchange for <style=cIsUtility>refilling a secondary stock</style> and dealing <style=cIsDamage>{100f * ConquerorStaticValues.chargedwarpDamageCoefficient}% damage</style> instead.");
             #endregion
 
             #region Special

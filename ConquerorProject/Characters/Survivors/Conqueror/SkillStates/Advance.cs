@@ -23,8 +23,9 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         private float maxDistance = 45f;
         private BlastAttack bleedblast;
         private BlastAttack pullblast;
-        private float pullblastDamageCoefficient = 0.01f;
-        private float bleedblastDamageCoefficient = 4.5f;
+        private float pullblastDamageCoefficient = 0f;
+        private float bleedblastDamageCoefficient = ConquerorStaticValues.warpDamageCoefficient;
+        private float chargedbleedblastDamageCoefficient = ConquerorStaticValues.chargedwarpDamageCoefficient;
         private ChildLocator childLocator;
         private Vector3 forwardDirection;
         private Animator animator;
@@ -172,7 +173,15 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             bleedblast.baseForce = 300;
             bleedblast.canRejectForce = false;
             bleedblast.falloffModel = BlastAttack.FalloffModel.None;
-            bleedblast.baseDamage = bleedblastDamageCoefficient;
+            if (this.charge >= this.chargeDuration)
+            {
+                bleedblast.baseDamage = chargedbleedblastDamageCoefficient;
+
+            }
+            else
+            {
+                bleedblast.baseDamage = bleedblastDamageCoefficient;
+            }
             bleedblast.damageType = DamageType.BleedOnHit;
             bleedblast.crit = RollCrit();
             bleedblast.position = this.aimSphere.transform.position;

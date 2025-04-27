@@ -437,13 +437,13 @@ namespace ConquerorMod.Survivors.Conqueror
 
             if (sender.HasBuff(ConquerorBuffs.frenzyBuff))
             {
-                args.attackSpeedMultAdd += 0.2f;
-                args.moveSpeedMultAdd += 0.1f;
+                args.attackSpeedMultAdd += 0.25f;
+                args.moveSpeedMultAdd += 0.2f;
             }
             if (sender.HasBuff(ConquerorBuffs.intimidateDebuff))
             {
-                args.armorAdd -= 20;
-                args.moveSpeedReductionMultAdd += .1f;
+                args.armorAdd -= 30;
+                args.moveSpeedReductionMultAdd += .2f;
             }
         }
     }
