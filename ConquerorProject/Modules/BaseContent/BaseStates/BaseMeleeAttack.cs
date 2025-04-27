@@ -32,8 +32,6 @@ namespace ConquerorMod.Modules.BaseStates
         protected float attackRecoil = 0.75f;
         protected float hitHopVelocity = 4f;
 
-        protected string swingSoundString = "";
-        protected string hitSoundString = "";
         protected string muzzleString = "SwingCenter";
         protected string playbackRateParam = "Slash.playbackRate";
         protected GameObject swingEffectPrefab;
@@ -103,7 +101,9 @@ namespace ConquerorMod.Modules.BaseStates
 
         protected virtual void OnHitEnemyAuthority()
         {
-            Util.PlaySound(hitSoundString, gameObject);
+            Util.PlaySound("Play_chef_skill1_boosted_shoot", base.gameObject);
+            Util.PlaySound("Play_chef_skill1_return", base.gameObject); 
+            Util.PlaySound("Play_bellBody_attackLand", base.gameObject);
 
             if (!hasHopped)
             {
@@ -143,7 +143,8 @@ namespace ConquerorMod.Modules.BaseStates
         private void EnterAttack()
         {
             hasFired = true;
-            Util.PlayAttackSpeedSound(swingSoundString, gameObject, attackSpeedStat);
+            Util.PlaySound("Play_falseson_skill1_swing", base.gameObject);
+            Util.PlaySound("Play_acrid_m1_slash", base.gameObject);
 
             PlaySwingEffect();
 

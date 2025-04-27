@@ -14,11 +14,9 @@ namespace ConquerorMod.Survivors.Conqueror
 
         public static GameObject bombExplosionEffect;
 
-        // networked hit sounds
-        public static NetworkSoundEventDef swordHitSoundEvent;
-
         //projectiles
-        public static GameObject bombProjectilePrefab;
+        public static GameObject ropeBackpackProjectilePrefab;
+        public static GameObject originBackpackProjectilePrefab;
 
         private static AssetBundle _assetBundle;
 
@@ -27,11 +25,11 @@ namespace ConquerorMod.Survivors.Conqueror
 
             _assetBundle = assetBundle;
 
-            swordHitSoundEvent = Content.CreateAndAddNetworkSoundEventDef("HenrySwordHit");
-
             CreateEffects();
 
             CreateProjectiles();
+
+            CreateBuffWard();
         }
 
         #region effects
@@ -69,18 +67,23 @@ namespace ConquerorMod.Survivors.Conqueror
         #region projectiles
         private static void CreateProjectiles()
         {
-            CreateBombProjectile();
-            Content.AddProjectilePrefab(bombProjectilePrefab);
+            CreateRopeBackpackProjectile();
+            Content.AddProjectilePrefab(ropeBackpackProjectilePrefab);
         }
 
-        private static void CreateBombProjectile()
+        private static void CreateBuffWard()
+        {
+            
+        }
+
+        private static void CreateRopeBackpackProjectile()
         {
             //highly recommend setting up projectiles in editor, but this is a quick and dirty way to prototype if you want
-            bombProjectilePrefab = Asset.CloneProjectilePrefab("CommandoGrenadeProjectile", "HenryBombProjectile");
+            ropeBackpackProjectilePrefab = Asset.CloneProjectilePrefab("CommandoGrenadeProjectile", "HenryBombProjectile");
 
             //remove their ProjectileImpactExplosion component and start from default values
-            UnityEngine.Object.Destroy(bombProjectilePrefab.GetComponent<ProjectileImpactExplosion>());
-            ProjectileImpactExplosion bombImpactExplosion = bombProjectilePrefab.AddComponent<ProjectileImpactExplosion>();
+            UnityEngine.Object.Destroy(ropeBackpackProjectilePrefab.GetComponent<ProjectileImpactExplosion>());
+            ProjectileImpactExplosion bombImpactExplosion = ropeBackpackProjectilePrefab.AddComponent<ProjectileImpactExplosion>();
             
             bombImpactExplosion.blastRadius = 16f;
             bombImpactExplosion.blastDamageCoefficient = 1f;
@@ -88,16 +91,19 @@ namespace ConquerorMod.Survivors.Conqueror
             bombImpactExplosion.destroyOnEnemy = true;
             bombImpactExplosion.lifetime = 12f;
             bombImpactExplosion.impactEffect = bombExplosionEffect;
-            bombImpactExplosion.lifetimeExpiredSound = Content.CreateAndAddNetworkSoundEventDef("HenryBombExplosion");
             bombImpactExplosion.timerAfterImpact = true;
             bombImpactExplosion.lifetimeAfterImpact = 0.1f;
 
-            ProjectileController bombController = bombProjectilePrefab.GetComponent<ProjectileController>();
+            ProjectileController bombController = ropeBackpackProjectilePrefab.GetComponent<ProjectileController>();
 
             if (_assetBundle.LoadAsset<GameObject>("HenryBombGhost") != null)
                 bombController.ghostPrefab = _assetBundle.CreateProjectileGhostPrefab("HenryBombGhost");
             
             bombController.startSound = "";
+
+            
+            ropeBackpackZone = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Warbanner/").WaitForCompletion(), "RopeBackpackZone")
+            BuffWard ropeBackpackWard = ropeBackpackZone.AddComponent<BuffWard>();
         }
         #endregion projectiles
     }

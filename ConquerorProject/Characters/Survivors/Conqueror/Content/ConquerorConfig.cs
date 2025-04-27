@@ -11,7 +11,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
         public static void Init()
         {
-            string section = "Henry";
+            string section = "Conqueror";
 
             someConfigBool = Config.BindAndOptions(
                 section,

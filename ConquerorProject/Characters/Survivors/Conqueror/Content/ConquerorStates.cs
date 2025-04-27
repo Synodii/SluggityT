@@ -8,11 +8,11 @@ namespace ConquerorMod.Survivors.Conqueror
         {
             Modules.Content.AddEntityState(typeof(Overpower));
 
-            Modules.Content.AddEntityState(typeof(Shoot));
+            Modules.Content.AddEntityState(typeof(EyeMunch));
 
             Modules.Content.AddEntityState(typeof(Advance));
 
-            Modules.Content.AddEntityState(typeof(ThrowBomb));
+            Modules.Content.AddEntityState(typeof(RopeBackpack));
         }
     }
 }

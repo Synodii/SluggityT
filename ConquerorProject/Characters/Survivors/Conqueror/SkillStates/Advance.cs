@@ -28,10 +28,9 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         private ChildLocator childLocator;
         private Vector3 forwardDirection;
         private Animator animator;
-        public static string beginSoundString = "Play_imp_attack_blink";
 
         private float chargeDuration;
-        private float baseChargeDuration = 1.2f;
+        private float baseChargeDuration = 1f;
         public float charge;
         private bool isCharged;
         private float baseMaxSecondaryStock;
@@ -48,7 +47,9 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             this.chargeDuration = this.baseChargeDuration / this.attackSpeedStat;
 
             //AkSoundEngine.PostEvent("Judgement", base.gameObject);
-            Util.PlaySound("Play_imp_attack_blink", base.gameObject);
+            Util.PlaySound("Play_voidDevastator_m1_stick", base.gameObject);
+            Util.PlaySound("Play_imp_overlord_attack1_impact", base.gameObject);
+            Util.PlaySound("Play_imp_attack_tell", base.gameObject);
             //base.PlayAnimation("FullBody, Override", BackflipState.BackflipStateHash, BackflipState.BackflipParamHash, BackflipState.duration);
 
         }
@@ -121,7 +122,10 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             if (!this.isCharged && this.charge >= this.chargeDuration)
             {
                 this.isCharged = true;
-                Util.PlaySound("Play_imp_attack_tell", base.gameObject);
+                Util.PlaySound("Play_voidDevastator_step", base.gameObject);
+                Util.PlaySound("Play_imp_overlord_attack1_impact", base.gameObject);
+                Util.PlaySound("Play_voidman_sprint_start", base.gameObject);
+
             }
         }
 
@@ -199,7 +203,9 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 Util.CleanseBody(base.characterBody, true, false, false, true, true, true);
             }
 
-            Util.PlaySound(beginSoundString, gameObject);
+            Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+            Util.PlaySound("Play_imp_attack_blink", gameObject);
+            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
             this.CreateBlinkEffect(Util.GetCorePosition(base.gameObject));
         }
 

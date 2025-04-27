@@ -2,18 +2,18 @@
 using EntityStates;
 using RoR2;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
     public class Overpower : BaseMeleeAttack
     {
-        public int step;
 
         public override void OnEnter()
         {
             hitboxGroupName = "SwordGroup";
 
-            damageType = DamageType.Generic;
+            damageType = DamageTypeCombo.GenericPrimary;
             damageCoefficient = ConquerorStaticValues.swingDamageCoefficient;
             procCoefficient = 1f;
             pushForce = 300f;
@@ -30,17 +30,23 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
             hitStopDuration = 0.012f;
             attackRecoil = 0.5f;
-            hitSoundString = "";
             muzzleString = swingIndex % 2 == 0 ? "SwingMuzzle1" : "SwingMuzzle2";
             playbackRateParam = "Swing.playbackRate";
 
+            base.OnEnter();
+        }
+
+        protected override void ModifyOverlapAttack(OverlapAttack overlapAttack)
+        {
+            base.ModifyOverlapAttack(overlapAttack);
+            
             if (swingIndex == 2)
             {
                 Log.Debug("Trigger Bleed+Slayer");
-                attack.damageType.damageType = RoR2.DamageType.BleedOnHit | RoR2.DamageType.BonusToLowHealth;
+                attack.damageType = RoR2.DamageType.BleedOnHit | RoR2.DamageType.BonusToLowHealth;
             }
 
-            base.OnEnter();
+            overlapAttack.damageType.damageSource = DamageSource.Primary;
         }
 
         protected override void PlayAttackAnimation()
@@ -56,7 +62,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         public override InterruptPriority GetMinimumInterruptPriority()
         {
-            if (step == 2)
+            if (swingIndex == 2)
             {
                 return InterruptPriority.Skill;
             }

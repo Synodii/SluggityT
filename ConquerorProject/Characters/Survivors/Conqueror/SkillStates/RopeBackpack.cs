@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
-    public class ThrowBomb : GenericProjectileBaseState
+    public class RopeBackpack : GenericProjectileBaseState
     {
         public static float BaseDuration = 0.65f;
         //delays for projectiles feel absolute ass so only do this if you know what you're doing, otherwise it's best to keep it at 0
@@ -16,11 +16,9 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         public override void OnEnter()
         {
-            projectilePrefab = ConquerorAssets.bombProjectilePrefab;
+            projectilePrefab = ConquerorAssets.ropeBackpackProjectilePrefab;
             //base.effectPrefab = Modules.Assets.SomeMuzzleEffect;
             //targetmuzzle = "muzzleThrow"
-
-            attackSoundString = "HenryBombThrow";
 
             baseDuration = BaseDuration;
             baseDelayBeforeFiringProjectile = BaseDelayDuration;
@@ -52,7 +50,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         public override InterruptPriority GetMinimumInterruptPriority()
         {
-            return InterruptPriority.Skill;
+            return InterruptPriority.PrioritySkill;
         }
 
         public override void PlayAnimation(float duration)

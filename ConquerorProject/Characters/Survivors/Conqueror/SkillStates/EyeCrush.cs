@@ -2,10 +2,12 @@
 using ConquerorMod.Survivors.Conqueror;
 using RoR2;
 using UnityEngine;
+using UnityEngine.Networking;
+
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
-    public class Shoot : BaseSkillState
+/*    public class EyeCrush : BaseSkillState
     {
         public static float damageCoefficient = ConquerorStaticValues.offenceeyeDamageCoefficient;
         public static float procCoefficient = 1f;
@@ -107,5 +109,5 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             return InterruptPriority.PrioritySkill;
         }
-    }
+    }*/
 }

@@ -220,16 +220,16 @@ namespace ConquerorMod.Survivors.Conqueror
             //it is also a SteppedSkillDef. Custom Skilldefs are very useful for custom behaviors related to casting a skill. see ror2's different skilldefs for reference
             SteppedSkillDef primarySkillDef1 = Skills.CreateSkillDef<SteppedSkillDef>(new SkillDefInfo
                 (
-                    "ConquerorSlash",
-                    CONQUEROR_PREFIX + "PRIMARY_SLASH_NAME",
-                    CONQUEROR_PREFIX + "PRIMARY_SLASH_DESCRIPTION",
+                    "ConquerorAxe",
+                    CONQUEROR_PREFIX + "PRIMARY_AXE_NAME",
+                    CONQUEROR_PREFIX + "PRIMARY_AXE_DESCRIPTION",
                     assetBundle.LoadAsset<Sprite>("texPrimaryIcon"),
                     new EntityStates.SerializableEntityStateType(typeof(SkillStates.Overpower)),
                     "Weapon",
                     true
                 ));
             //custom Skilldefs can have additional fields that you can set manually
-            primarySkillDef1.stepCount = 2;
+            primarySkillDef1.stepCount = 3;
             primarySkillDef1.stepGraceDuration = 0.5f;
 
             Skills.AddPrimarySkills(bodyPrefab, primarySkillDef1);
@@ -242,17 +242,17 @@ namespace ConquerorMod.Survivors.Conqueror
             //here is a basic skill def with all fields accounted for
             SkillDef secondarySkillDef1 = Skills.CreateSkillDef(new SkillDefInfo
             {
-                skillName = "ConquerorGun",
-                skillNameToken = CONQUEROR_PREFIX + "SECONDARY_GUN_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "SECONDARY_GUN_DESCRIPTION",
+                skillName = "ConquerorMunch",
+                skillNameToken = CONQUEROR_PREFIX + "SECONDARY_CONSUMEEYE_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "SECONDARY_CONSUMEEYE_DESCRIPTION",
                 keywordTokens = new string[] { "KEYWORD_AGILE" },
                 skillIcon = assetBundle.LoadAsset<Sprite>("texSecondaryIcon"),
 
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Shoot)),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.EyeMunch)),
                 activationStateMachineName = "Weapon2",
                 interruptPriority = EntityStates.InterruptPriority.Skill,
 
-                baseRechargeInterval = 13f,
+                baseRechargeInterval = 15f,
                 baseMaxStock = 3,
 
                 rechargeStock = 1,
@@ -282,9 +282,9 @@ namespace ConquerorMod.Survivors.Conqueror
             //here's a skilldef of a typical movement skill.
             SkillDef utilitySkillDef1 = Skills.CreateSkillDef(new SkillDefInfo
             {
-                skillName = "ConquerorRoll",
-                skillNameToken = CONQUEROR_PREFIX + "UTILITY_ROLL_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_ROLL_DESCRIPTION",
+                skillName = "ConquerorWarp",
+                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
                 skillIcon = assetBundle.LoadAsset<Sprite>("texUtilityIcon"),
 
                 activationState = new EntityStates.SerializableEntityStateType(typeof(Advance)),
@@ -320,12 +320,12 @@ namespace ConquerorMod.Survivors.Conqueror
             //a basic skill. some fields are omitted and will just have default values
             SkillDef specialSkillDef1 = Skills.CreateSkillDef(new SkillDefInfo
             {
-                skillName = "ConquerorBomb",
-                skillNameToken = CONQUEROR_PREFIX + "SPECIAL_BOMB_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "SPECIAL_BOMB_DESCRIPTION",
+                skillName = "ConquerorRopeBackpack",
+                skillNameToken = CONQUEROR_PREFIX + "SPECIAL_ROPEBACKPACK_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "SPECIAL_ROPEBACKPACK_DESCRIPTION",
                 skillIcon = assetBundle.LoadAsset<Sprite>("texSpecialIcon"),
 
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.ThrowBomb)),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.RopeBackpack)),
                 //setting this to the "weapon2" EntityStateMachine allows us to cast this skill at the same time primary, which is set to the "weapon" EntityStateMachine
                 activationStateMachineName = "Weapon2", interruptPriority = EntityStates.InterruptPriority.Skill,
 
@@ -435,9 +435,15 @@ namespace ConquerorMod.Survivors.Conqueror
         private void RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, R2API.RecalculateStatsAPI.StatHookEventArgs args)
         {
 
-            if (sender.HasBuff(ConquerorBuffs.armorBuff))
+            if (sender.HasBuff(ConquerorBuffs.frenzyBuff))
             {
-                args.armorAdd += 300;
+                args.attackSpeedMultAdd += 0.2f;
+                args.moveSpeedMultAdd += 0.1f;
+            }
+            if (sender.HasBuff(ConquerorBuffs.intimidateDebuff))
+            {
+                args.armorAdd -= 20;
+                args.moveSpeedReductionMultAdd += .1f;
             }
         }
     }

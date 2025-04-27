@@ -5,16 +5,23 @@ namespace ConquerorMod.Survivors.Conqueror
 {
     public static class ConquerorBuffs
     {
-        // armor buff gained during roll
-        public static BuffDef armorBuff;
+        public static BuffDef frenzyBuff;
+        public static BuffDef intimidateDebuff;
+
 
         public static void Init(AssetBundle assetBundle)
         {
-            armorBuff = Modules.Content.CreateAndAddBuff("ConquerorArmorBuff",
+            frenzyBuff = Modules.Content.CreateAndAddBuff("ConquerorFrenziedBuff",
                 LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite,
-                Color.white,
-                false,
+                Color.magenta,
+                true,
                 false);
+
+            intimidateDebuff = Modules.Content.CreateAndAddBuff("ConquerorIntimidatedBuff",
+                LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite,
+                Color.green,
+                false,
+                true);
 
         }
     }

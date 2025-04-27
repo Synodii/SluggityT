@@ -31,7 +31,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             Language.Add(prefix + "NAME", "Conqueror");
             Language.Add(prefix + "DESCRIPTION", desc);
-            Language.Add(prefix + "SUBTITLE", "The Chosen One");
+            Language.Add(prefix + "SUBTITLE", "Displaced Hero");
             Language.Add(prefix + "LORE", "sample lore");
             Language.Add(prefix + "OUTRO_FLAVOR", outro);
             Language.Add(prefix + "OUTRO_FAILURE", outroFailure);
@@ -52,16 +52,16 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Secondary
             Language.Add(prefix + "SECONDARY_CONSUMEEYE_NAME", "Imbibe");
-            Language.Add(prefix + "SECONDARY_CONSUMEEYE_DESCRIPTION", Tokens.agilePrefix + $"Regenerative. Consume an Imp eye to recover <style=cIsHealth>15% max health</style>. Transforms into Smother while Special is active.");
+            Language.Add(prefix + "SECONDARY_CONSUMEEYE_DESCRIPTION", Tokens.agilePrefix + $"Regenerative. Consume an Imp eye to recover <style=cIsHealing>15% max health</style>. Becomes Smother while Special is active.");
             #endregion
 
             #region Utility
-            Language.Add(prefix + "UTILITY_ROLL_NAME", "Roll");
-            Language.Add(prefix + "UTILITY_ROLL_DESCRIPTION", "Roll a short distance, gaining <style=cIsUtility>300 armor</style>. <style=cIsUtility>You cannot be hit during the roll.</style>");
+            Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", "Roll a short distance, gaining <style=cIsUtility>300 armor</style>. <style=cIsUtility>You cannot be hit during the roll.</style>");
             #endregion
 
             #region Special
-            Language.Add(prefix + "SPECIAL_BOMB_NAME", "Bomb");
+            Language.Add(prefix + "SPECIAL_BOMB_NAME", "Conquest");
             Language.Add(prefix + "SPECIAL_BOMB_DESCRIPTION", $"Throw a bomb for <style=cIsDamage>{100f * ConquerorStaticValues.apportduffelretrieveDamageCoefficient}% damage</style>.");
             #endregion
 
