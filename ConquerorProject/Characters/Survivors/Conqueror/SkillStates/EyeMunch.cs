@@ -30,8 +30,10 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             muzzleString = "Muzzle";
             hasFired = false;
 
-            Util.PlaySound("Play_voidman_R_activate", gameObject);
-            Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
+            //Util.PlaySound("Play_voidman_R_activate", gameObject);
+            Util.PlaySound("Play_chef_skill1_return", gameObject);
+            Util.PlaySound("Play_scav_backpack_open", gameObject);
+
 
 
             PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1.8f);
@@ -68,9 +70,9 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 procChainMask.AddProc(ProcType.VoidSurvivorCrush);
                 Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
                 Util.PlaySound("Play_gup_step", gameObject);
-                Util.PlaySound("Play_ui_obj_eradicator_open", base.gameObject);
+                //Util.PlaySound("Play_ui_obj_eradicator_open", base.gameObject);
 
-                characterBody.AddTimedBuff(ConquerorBuffs.frenzyBuff, 4f);
+                characterBody.AddTimedBuff(ConquerorBuffs.frenzyBuff, 5f);
 
                 if (selfHealFraction > 0f)
                 {

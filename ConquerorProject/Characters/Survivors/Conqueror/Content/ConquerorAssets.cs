@@ -3,6 +3,8 @@ using UnityEngine;
 using ConquerorMod.Modules;
 using System;
 using RoR2.Projectile;
+using R2API;
+using ConquerorMod.Survivors.Conqueror.Components;
 
 namespace ConquerorMod.Survivors.Conqueror
 {
@@ -13,6 +15,9 @@ namespace ConquerorMod.Survivors.Conqueror
         public static GameObject swordHitImpactEffect;
 
         public static GameObject bombExplosionEffect;
+
+        public static GameObject nemGasGrenade;
+        public static GameObject ropeBackpackZone;
 
         //projectiles
         public static GameObject ropeBackpackProjectilePrefab;
@@ -29,7 +34,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             CreateProjectiles();
 
-            CreateBuffWard();
+            //CreateBuffWard();
         }
 
         #region effects
@@ -71,40 +76,67 @@ namespace ConquerorMod.Survivors.Conqueror
             Content.AddProjectilePrefab(ropeBackpackProjectilePrefab);
         }
 
-        private static void CreateBuffWard()
-        {
-            CreateRopeBackpackProjectile();
-            Content.;
-        }
-
         private static void CreateRopeBackpackProjectile()
         {
-            //highly recommend setting up projectiles in editor, but this is a quick and dirty way to prototype if you want
-            ropeBackpackProjectilePrefab = Asset.CloneProjectilePrefab("LoaderYankHook", "HenryBombProjectile");
+            ropeBackpackProjectilePrefab = _assetBundle.LoadAndAddProjectilePrefab("HenryBombProjectile");
+            ropeBackpackProjectilePrefab.layer = LayerIndex.projectile.intVal;
 
-            //remove their ProjectileImpactExplosion component and start from default values
-            UnityEngine.Object.Destroy(ropeBackpackProjectilePrefab.GetComponent<ProjectileImpactExplosion>());
-            ProjectileImpactExplosion bombImpactExplosion = ropeBackpackProjectilePrefab.AddComponent<ProjectileImpactExplosion>();
-            
-            bombImpactExplosion.blastRadius = 16f;
-            bombImpactExplosion.blastDamageCoefficient = 1f;
-            bombImpactExplosion.falloffModel = BlastAttack.FalloffModel.None;
-            bombImpactExplosion.destroyOnEnemy = true;
-            bombImpactExplosion.lifetime = 12f;
-            bombImpactExplosion.impactEffect = bombExplosionEffect;
-            bombImpactExplosion.timerAfterImpact = true;
-            bombImpactExplosion.lifetimeAfterImpact = 0.1f;
+            Rigidbody rb = ropeBackpackProjectilePrefab.GetComponent<Rigidbody>();
 
-            ProjectileController bombController = ropeBackpackProjectilePrefab.GetComponent<ProjectileController>();
+            ProjectileSimple ps = ropeBackpackProjectilePrefab.GetComponent<ProjectileSimple>();
 
-            if (_assetBundle.LoadAsset<GameObject>("HenryBombGhost") != null)
-                bombController.ghostPrefab = _assetBundle.CreateProjectileGhostPrefab("HenryBombGhost");
-            
-            bombController.startSound = "";
+            ProjectileStickOnImpact stickOnImpact = ropeBackpackProjectilePrefab.GetComponent<ProjectileStickOnImpact>();
 
-            Content.AddBuffWard
-            ropeBackpackZone = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Warbanner/").WaitForCompletion(), "RopeBackpackZone")
-            BuffWard ropeBackpackWard = ropeBackpackZone.AddComponent<BuffWard>();
+            ProjectileController pc = ropeBackpackProjectilePrefab.GetComponent<ProjectileController>();
+
+            CapsuleCollider collider = ropeBackpackProjectilePrefab.GetComponent<CapsuleCollider>();
+
+
+
+            ProjectileOverlapAttack piss = ropeBackpackProjectilePrefab.GetComponent<ProjectileOverlapAttack>();
+
+            ProjectileDamage projectileDamage = ps.GetComponent<ProjectileDamage>();
+            DamageTypeCombo hookDmg = new DamageTypeCombo
+            {
+                damageType = DamageType.NonLethal,
+                damageTypeExtended = DamageTypeExtended.Generic,
+                damageSource = DamageSource.Secondary,
+            };
+            //hookDmg.
+
+
+            RopeBackpackController fishHook = ropeBackpackProjectilePrefab.AddComponent<RopeBackpackController>();
+            fishHook.rb = rb;
+            fishHook.stickComponent = stickOnImpact;
+            fishHook.controller = pc;
+            fishHook.projectileDamage = projectileDamage;
+            fishHook.backpackCollider = collider;
+            fishHook.projOverlap = piss;
+            fishHook.projSimple = ps;
+            fishHook.lineRenderer = ropeBackpackProjectilePrefab.GetComponent<LineRenderer>();
+
+
+            //item grabber
+            GameObject ItemInteractor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            ItemInteractor.transform.parent = ropeBackpackProjectilePrefab.transform;
+            UnityEngine.Object.Destroy(ItemInteractor.GetComponent<MeshRenderer>());
+            UnityEngine.Object.Destroy(ItemInteractor.GetComponent<MeshFilter>());
+            ItemInteractor.GetComponent<SphereCollider>().isTrigger = true;
+            ItemInteractor.transform.localPosition = Vector3.zero;
+            ItemInteractor.transform.localScale = Vector3.one * 6;
+            ItemInteractor.layer = 15;
+
+            BuffWard buffWard = ropeBackpackProjectilePrefab.AddComponent<BuffWard>();
+            buffWard.radius = 18;
+            buffWard.interval = 1;
+            buffWard.rangeIndicator = null;
+            buffWard.buffDef = ConquerorBuffs.intimidateDebuff;
+            buffWard.buffDuration = 1.5f;
+            buffWard.floorWard = true;
+            buffWard.expires = false;
+            buffWard.invertTeamFilter = true;
+            buffWard.expireDuration = 0;
+            buffWard.animateRadius = false;
         }
         #endregion projectiles
     }

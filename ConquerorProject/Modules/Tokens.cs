@@ -4,6 +4,9 @@
     {
         public const string agilePrefix = "<style=cIsUtility>Agile.</style>";
 
+        public const string stunningPrefix = "<style=cIsUtility>Stunning.</style>";
+
+
         public static string DamageText(string text)
         {
             return $"<style=cIsDamage>{text}</style>";

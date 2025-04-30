@@ -42,8 +42,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             
             if (swingIndex == 2)
             {
-                Log.Debug("Trigger Bleed+Slayer");
-                attack.damageType = RoR2.DamageType.BleedOnHit | RoR2.DamageType.BonusToLowHealth;
+                attack.damageType = RoR2.DamageType.BonusToLowHealth;
+                //attack.damageType = RoR2.DamageType.BleedOnHit
             }
 
             overlapAttack.damageType.damageSource = DamageSource.Primary;

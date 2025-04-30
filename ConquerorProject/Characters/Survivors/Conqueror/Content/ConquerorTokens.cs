@@ -47,22 +47,25 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Primary
             Language.Add(prefix + "PRIMARY_AXE_NAME", "Overpower");
-            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", Tokens.agilePrefix + $"Swing forward for <style=cIsDamage>{100f * ConquerorStaticValues.swingDamageCoefficient}% damage</style>. Third hit is <style=cIsDamage>Slayer</style> and <style=cIsDamage>Bleeding</style>");
+            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", Tokens.agilePrefix + $"Swing forward for <style=cIsDamage>{100f * ConquerorStaticValues.swingDamageCoefficient}% damage</style>. Every 3rd hit has <style=cIsDamage>Slayer</style>.");
             #endregion
 
             #region Secondary
-            Language.Add(prefix + "SECONDARY_CONSUMEEYE_NAME", "Imbibe");
-            Language.Add(prefix + "SECONDARY_CONSUMEEYE_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>. <style=cIsUtility>Becomes Smother while Special is active.</style>");
+            Language.Add(prefix + "SECONDARY_MUNCH_NAME", "Imbibe");
+            Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>. <style=cIsUtility>Becomes Smother while Special is active.</style>");
             #endregion
 
             #region Utility
             Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
-            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, it <style=cIsUtility>cleanses debuffs</style> and deals <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> and <style=cIsUtility>pulling</style> enemies. When fully charged, incur <style=cIsHealth>30% health</style> in exchange for <style=cIsUtility>refilling a secondary stock</style> and dealing <style=cIsDamage>{100f * ConquerorStaticValues.chargedwarpDamageCoefficient}% damage</style> instead.");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, <style=cIsUtility>cleanse debuffs</style> and deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> and <style=cIsUtility>pulling</style> in enemies. At full charge, incur <style=cIsHealth>30% health</style>, <style=cIsUtility>refill a secondary stock,</style> and deal <style=cIsDamage>{100f * ConquerorStaticValues.chargedwarpDamageCoefficient}% damage</style> instead.");
             #endregion
 
             #region Special
-            Language.Add(prefix + "SPECIAL_BOMB_NAME", "Conquest");
-            Language.Add(prefix + "SPECIAL_BOMB_DESCRIPTION", $"Throw a bomb for <style=cIsDamage>{100f * ConquerorStaticValues.apportduffelretrieveDamageCoefficient}% damage</style>.");
+            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_NAME", "Conquest");
+            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_DESCRIPTION", $"Deploy your backpack. Allies near it are Frenzied, while enemies are Intimidated. Leave its radius or reactivate to reclaim it, dealing <style=cIsDamage>{100f * ConquerorStaticValues.ropeduffelretrieveDamageCoefficient}% damage</style> and <style=cIsUtility>Stunning</style> enemies in its path.");
+
+            Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_NAME", "Conquest");
+            Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_DESCRIPTION", Tokens.stunningPrefix +  $"Recall your backpack, dealing <style=cIsDamage>{100f * ConquerorStaticValues.ropeduffelretrieveDamageCoefficient}% damage</style> to any enemies it impacts.");
             #endregion
 
             #region Achievements

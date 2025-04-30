@@ -101,7 +101,6 @@ namespace ConquerorMod.Modules.BaseStates
 
         protected virtual void OnHitEnemyAuthority()
         {
-            Util.PlaySound("Play_chef_skill1_boosted_shoot", base.gameObject);
             Util.PlaySound("Play_chef_skill1_return", base.gameObject); 
             Util.PlaySound("Play_bellBody_attackLand", base.gameObject);
 

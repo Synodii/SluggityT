@@ -176,7 +176,6 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             if (this.charge >= this.chargeDuration)
             {
                 bleedblast.baseDamage = chargedbleedblastDamageCoefficient;
-
             }
             else
             {

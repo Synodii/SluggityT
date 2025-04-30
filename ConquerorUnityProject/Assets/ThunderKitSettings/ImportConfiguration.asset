@@ -1,0 +1,275 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8797112156922661229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: R2API Submodule Installer
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:R2APISubmoduleInstaller
+  enabled: 1
+  serializeSelectionIntoJson: 1
+  r2apiSubmodules: []
+--- !u!114 &-6317939084953825206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Import Project Settings
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config.Common:ImportProjectSettings
+  enabled: 1
+  IncludedSettings: 0
+--- !u!114 &-5130029220906725847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: MMHook Generator
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:MMHookGeneratorConfiguration
+  enabled: 1
+  assemblyNames:
+  - RoR2.dll
+  - KinematicCharacterController.dll
+  hookGenExecutable: {fileID: 0}
+--- !u!114 &-5019649661708975653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Configure Addressable Graphics Settings
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:ConfigureAddressableGraphics
+  enabled: 1
+--- !u!114 &-4912201813648685342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Create Game Package
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config:CreateGamePackage
+  enabled: 1
+--- !u!114 &-4741363682685784388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Import Addressable Catalog
+  m_EditorClassIdentifier: 
+  enabled: 1
+--- !u!114 &-3858558043642776358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Get Bitness
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config.Common:GetBitness
+  enabled: 1
+--- !u!114 &-2181129848655697692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Prompt Restart
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config.Common:PromptRestart
+  enabled: 1
+--- !u!114 &-547667424350729098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Install RoR2 Editor Kit
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:InstallR2EK
+  enabled: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: ImportConfiguration
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Data:ImportConfiguration
+  ConfigurationExecutors: []
+  configurationIndex: -1
+  totalImportExtensionCount: 19
+--- !u!114 &238890980173226690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Assembly Publicizer
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:AssemblyPublicizerConfiguration
+  enabled: 1
+  assemblyNames:
+  - RoR2.dll
+  - KinematicCharacterController.dll
+  NStripExecutable: {fileID: 0}
+--- !u!114 &1774198836345802715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: PostProcessing Unity Package Installer
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:PostProcessingInstaller
+  enabled: 1
+--- !u!114 &2242051772776537133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Disable Assembly Updater
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config.Common:DisableAssemblyUpdater
+  enabled: 1
+--- !u!114 &2269413361707327101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Install RoR2MultiplayerHLAPI
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:InstallMultiplayerHLAPI
+  enabled: 1
+--- !u!114 &2725105378773707405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Set Deferred Shading
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:SetDeferredShading
+  enabled: 1
+--- !u!114 &5091360842926349920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Import Assemblies
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config:ImportAssemblies
+  enabled: 1
+--- !u!114 &5290831116204537935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Beep
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config.Common:Beep
+  enabled: 1
+--- !u!114 &5461404355271324001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Ensure RoR2 Thunderstore Source
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:EnsureRoR2Thunderstore
+  enabled: 1
+--- !u!114 &6295994856476048694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Check Unity Version
+  m_EditorClassIdentifier: ThunderKit.Core:ThunderKit.Core.Config.Common:CheckUnityVersion
+  enabled: 1
+--- !u!114 &7515401959636197868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Install BepInEx
+  m_EditorClassIdentifier: RoR2Importers:RiskOfThunder.RoR2Importer:InstallBepInEx
+  enabled: 1

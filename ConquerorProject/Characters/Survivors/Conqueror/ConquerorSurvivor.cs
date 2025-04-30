@@ -30,7 +30,18 @@ namespace ConquerorMod.Survivors.Conqueror
 
         //used when registering your survivor's language tokens
         public override string survivorTokenPrefix => CONQUEROR_PREFIX;
-        
+
+        public static SteppedSkillDef primaryAxe;
+
+        public static SkillDef secondaryMunch;
+        public static SkillDef secondaryCrush;
+
+        public static SkillDef utilityWarp;
+
+        public static SkillDef specialRecallRopeBackpack;
+        public static SkillDef specialRopeBackpack;
+
+
         public override BodyInfo bodyInfo => new BodyInfo
         {
             bodyName = bodyName,
@@ -218,7 +229,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             //the primary skill is created using a constructor for a typical primary
             //it is also a SteppedSkillDef. Custom Skilldefs are very useful for custom behaviors related to casting a skill. see ror2's different skilldefs for reference
-            SteppedSkillDef primarySkillDef1 = Skills.CreateSkillDef<SteppedSkillDef>(new SkillDefInfo
+            ConquerorSurvivor.primaryAxe = Skills.CreateSkillDef<SteppedSkillDef>(new SkillDefInfo
                 (
                     "ConquerorAxe",
                     CONQUEROR_PREFIX + "PRIMARY_AXE_NAME",
@@ -229,10 +240,10 @@ namespace ConquerorMod.Survivors.Conqueror
                     true
                 ));
             //custom Skilldefs can have additional fields that you can set manually
-            primarySkillDef1.stepCount = 3;
-            primarySkillDef1.stepGraceDuration = 0.5f;
+            primaryAxe.stepCount = 3;
+            primaryAxe.stepGraceDuration = 0.5f;
 
-            Skills.AddPrimarySkills(bodyPrefab, primarySkillDef1);
+            Skills.AddPrimarySkills(bodyPrefab, primaryAxe);
         }
 
         private void AddSecondarySkills()
@@ -240,11 +251,11 @@ namespace ConquerorMod.Survivors.Conqueror
             Skills.CreateGenericSkillWithSkillFamily(bodyPrefab, SkillSlot.Secondary);
 
             //here is a basic skill def with all fields accounted for
-            SkillDef secondarySkillDef1 = Skills.CreateSkillDef(new SkillDefInfo
+            ConquerorSurvivor.secondaryMunch = Skills.CreateSkillDef(new SkillDefInfo
             {
                 skillName = "ConquerorMunch",
-                skillNameToken = CONQUEROR_PREFIX + "SECONDARY_CONSUMEEYE_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "SECONDARY_CONSUMEEYE_DESCRIPTION",
+                skillNameToken = CONQUEROR_PREFIX + "SECONDARY_MUNCH_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "SECONDARY_MUNCH_DESCRIPTION",
                 keywordTokens = new string[] { "KEYWORD_AGILE" },
                 skillIcon = assetBundle.LoadAsset<Sprite>("texSecondaryIcon"),
 
@@ -269,10 +280,9 @@ namespace ConquerorMod.Survivors.Conqueror
                 canceledFromSprinting = false,
                 cancelSprintingOnActivation = false,
                 forceSprintDuringState = false,
-
             });
 
-            Skills.AddSecondarySkills(bodyPrefab, secondarySkillDef1);
+            Skills.AddSecondarySkills(bodyPrefab, secondaryMunch);
         }
 
         private void AddUtiitySkills()
@@ -280,7 +290,7 @@ namespace ConquerorMod.Survivors.Conqueror
             Skills.CreateGenericSkillWithSkillFamily(bodyPrefab, SkillSlot.Utility);
 
             //here's a skilldef of a typical movement skill.
-            SkillDef utilitySkillDef1 = Skills.CreateSkillDef(new SkillDefInfo
+            ConquerorSurvivor.utilityWarp = Skills.CreateSkillDef(new SkillDefInfo
             {
                 skillName = "ConquerorWarp",
                 skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
@@ -309,8 +319,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 cancelSprintingOnActivation = false,
                 forceSprintDuringState = true,
             });
-
-            Skills.AddUtilitySkills(bodyPrefab, utilitySkillDef1);
+            Skills.AddUtilitySkills(bodyPrefab, utilityWarp);
         }
 
         private void AddSpecialSkills()
@@ -318,7 +327,7 @@ namespace ConquerorMod.Survivors.Conqueror
             Skills.CreateGenericSkillWithSkillFamily(bodyPrefab, SkillSlot.Special);
 
             //a basic skill. some fields are omitted and will just have default values
-            SkillDef specialSkillDef1 = Skills.CreateSkillDef(new SkillDefInfo
+            ConquerorSurvivor.specialRopeBackpack = Skills.CreateSkillDef(new SkillDefInfo
             {
                 skillName = "ConquerorRopeBackpack",
                 skillNameToken = CONQUEROR_PREFIX + "SPECIAL_ROPEBACKPACK_NAME",
@@ -336,10 +345,42 @@ namespace ConquerorMod.Survivors.Conqueror
                 mustKeyPress = false,
             });
 
-            Skills.AddSpecialSkills(bodyPrefab, specialSkillDef1);
+            ConquerorSurvivor.specialRecallRopeBackpack = Skills.CreateSkillDef(new SkillDefInfo
+            {
+                skillName = "ConquerorRecallRopeBackpack",
+                skillNameToken = CONQUEROR_PREFIX + "SPECIAL_RECALLROPEBACKPACK_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "SPECIAL_RECALLROPEBACKPACK_DESCRIPTION",
+                keywordTokens = new string[] { "KEYWORD_AGILE" },
+                skillIcon = assetBundle.LoadAsset<Sprite>("texUtilityIcon"),
+
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.RecallRopeBackpacks)),
+                activationStateMachineName = "Weapon2",
+                interruptPriority = EntityStates.InterruptPriority.Skill,
+
+                baseRechargeInterval = 0.5f,
+                baseMaxStock = 1,
+
+                rechargeStock = 1,
+                requiredStock = 1,
+                stockToConsume = 1,
+
+                resetCooldownTimerOnUse = false,
+                fullRestockOnAssign = true,
+                dontAllowPastMaxStocks = true,
+                mustKeyPress = true,
+                beginSkillCooldownOnSkillEnd = false,
+
+                isCombatSkill = false,
+                canceledFromSprinting = false,
+                cancelSprintingOnActivation = false,
+                forceSprintDuringState = false,
+            });
+
+            Skills.AddSpecialSkills(bodyPrefab, specialRecallRopeBackpack);
+            Skills.AddSpecialSkills(bodyPrefab, specialRopeBackpack);
         }
         #endregion skills
-        
+
         #region skins
         public override void InitializeSkins()
         {
@@ -432,13 +473,17 @@ namespace ConquerorMod.Survivors.Conqueror
             R2API.RecalculateStatsAPI.GetStatCoefficients += RecalculateStatsAPI_GetStatCoefficients;
         }
 
+        
+        private int frenzybuffCount;
         private void RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, R2API.RecalculateStatsAPI.StatHookEventArgs args)
         {
+            frenzybuffCount = 0;
 
             if (sender.HasBuff(ConquerorBuffs.frenzyBuff))
             {
-                args.attackSpeedMultAdd += 0.25f;
-                args.moveSpeedMultAdd += 0.2f;
+                frenzybuffCount = sender.GetBuffCount(ConquerorBuffs.frenzyBuff);
+                args.attackSpeedMultAdd += (0.25f * frenzybuffCount);
+                args.moveSpeedMultAdd += 0.2f * frenzybuffCount;
             }
             if (sender.HasBuff(ConquerorBuffs.intimidateDebuff))
             {
