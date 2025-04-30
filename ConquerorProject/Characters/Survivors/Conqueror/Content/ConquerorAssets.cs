@@ -30,15 +30,14 @@ namespace ConquerorMod.Survivors.Conqueror
 
             _assetBundle = assetBundle;
 
-            CreateEffects();
+            //CreateEffects();
 
             CreateProjectiles();
 
-            //CreateBuffWard();
         }
 
         #region effects
-        private static void CreateEffects()
+        /*private static void CreateEffects()
         {
             CreateBombExplosionEffect();
 
@@ -66,7 +65,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 cycleOffset = 0f
             };
 
-        }
+        }*/
         #endregion effects
 
         #region projectiles
@@ -78,7 +77,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
         private static void CreateRopeBackpackProjectile()
         {
-            ropeBackpackProjectilePrefab = _assetBundle.LoadAndAddProjectilePrefab("HenryBombProjectile");
+            ropeBackpackProjectilePrefab = _assetBundle.LoadAndAddProjectilePrefab("BackPackWardRope");
             ropeBackpackProjectilePrefab.layer = LayerIndex.projectile.intVal;
 
             Rigidbody rb = ropeBackpackProjectilePrefab.GetComponent<Rigidbody>();
@@ -91,40 +90,17 @@ namespace ConquerorMod.Survivors.Conqueror
 
             CapsuleCollider collider = ropeBackpackProjectilePrefab.GetComponent<CapsuleCollider>();
 
-
-
             ProjectileOverlapAttack piss = ropeBackpackProjectilePrefab.GetComponent<ProjectileOverlapAttack>();
 
-            ProjectileDamage projectileDamage = ps.GetComponent<ProjectileDamage>();
-            DamageTypeCombo hookDmg = new DamageTypeCombo
-            {
-                damageType = DamageType.NonLethal,
-                damageTypeExtended = DamageTypeExtended.Generic,
-                damageSource = DamageSource.Secondary,
-            };
-            //hookDmg.
 
-
-            RopeBackpackController fishHook = ropeBackpackProjectilePrefab.AddComponent<RopeBackpackController>();
-            fishHook.rb = rb;
-            fishHook.stickComponent = stickOnImpact;
-            fishHook.controller = pc;
-            fishHook.projectileDamage = projectileDamage;
-            fishHook.backpackCollider = collider;
-            fishHook.projOverlap = piss;
-            fishHook.projSimple = ps;
-            fishHook.lineRenderer = ropeBackpackProjectilePrefab.GetComponent<LineRenderer>();
-
-
-            //item grabber
-            GameObject ItemInteractor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            ItemInteractor.transform.parent = ropeBackpackProjectilePrefab.transform;
-            UnityEngine.Object.Destroy(ItemInteractor.GetComponent<MeshRenderer>());
-            UnityEngine.Object.Destroy(ItemInteractor.GetComponent<MeshFilter>());
-            ItemInteractor.GetComponent<SphereCollider>().isTrigger = true;
-            ItemInteractor.transform.localPosition = Vector3.zero;
-            ItemInteractor.transform.localScale = Vector3.one * 6;
-            ItemInteractor.layer = 15;
+            RopeBackpackController ropePack = ropeBackpackProjectilePrefab.AddComponent<RopeBackpackController>();
+            ropePack.rb = rb;
+            ropePack.stickComponent = stickOnImpact;
+            ropePack.controller = pc;
+            ropePack.backpackCollider = collider;
+            ropePack.projOverlap = piss;
+            ropePack.projSimple = ps;
+            ropePack.lineRenderer = ropeBackpackProjectilePrefab.AddComponent<LineRenderer>();
 
             BuffWard buffWard = ropeBackpackProjectilePrefab.AddComponent<BuffWard>();
             buffWard.radius = 18;
