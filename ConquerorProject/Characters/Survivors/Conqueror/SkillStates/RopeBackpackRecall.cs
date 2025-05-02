@@ -1,6 +1,6 @@
 ﻿using EntityStates;
-using EntityStates.Toolbot;
 using ConquerorMod.Survivors.Conqueror.Components;
+using ConquerorMod.Modules;
 using ConquerorMod.Survivors.Conqueror;
 using IL.RoR2;
 using R2API;
@@ -16,17 +16,19 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
     {
         public override void OnEnter()
         {
-            if (base.isAuthority)
+            if (base.isAuthority) 
             {
-                PlayAnimation("Gesture, Override", "SecondaryCastRecall", "SecondaryCast.playbackRate", 0.65f);
                 base.skillLocator.special.UnsetSkillOverride(gameObject, ConquerorSurvivor.specialRecallRopeBackpack, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
-                base.skillLocator.special.DeductStock(1); // may change this to deduct all stocks if all hooks are fired at once.
+                base.skillLocator.special.DeductStock(1);
                 ObjectTracker objt = characterBody.GetComponent<ObjectTracker>();
                 if (objt)
                 {
-                    //objt.animator = base.GetModelAnimator();
+                    objt.animator = base.GetModelAnimator();
                     objt.RecallAllRopeBackpacks();
                 }
+                PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1f);
+
+                characterBody.GetComponent<ConquerorController>().bagDeployed = false;
             }
 
             outer.SetNextStateToMain();
@@ -35,14 +37,10 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         public override void OnExit()
         {
             base.OnExit();
-
         }
         public override void FixedUpdate()
         {
-
             base.FixedUpdate();
-
-
         }
         public override InterruptPriority GetMinimumInterruptPriority()
         {

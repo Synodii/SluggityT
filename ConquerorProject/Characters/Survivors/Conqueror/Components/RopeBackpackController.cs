@@ -21,6 +21,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public ProjectileOverlapAttack projOverlap;
         public ProjectileSimple projSimple;
         public LineRenderer lineRenderer;
+        public BuffWard buffward;
 
         ObjectTracker objTracker;
 
@@ -37,18 +38,8 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         float maxFlyTime = 2;
         float BackpackTossVelocity = 30f;
 
-        HashSet<GameObject> objectsHooked = new HashSet<GameObject>();
-
-        UnityEvent<GameObject> onHookEvent = new UnityEvent<GameObject>();
-
         void Awake()
         {
-            /* UI ELEMENTS NOOOO I SHALL NOT
-            
-            //Log.Debug("[HOOK] New Hook Created ------------------------------------------------------------------------------------------------------------");
-            GameObject hi = Instantiate(ConquerorAssets.hookIndicator, transform);
-            hi.GetComponent<PositionIndicator>().targetTransform = transform;
-            hi.transform.position = Vector3.zero; */
         }
 
         void Start()
@@ -59,6 +50,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             backpackCollider.enabled = true;
             stickComponent.stickEvent.AddListener(OnStickEvent);
             projectileDamage.force = 0;
+            projOverlap.onServerHit.AddListener(() => ApplyHitStop(null));
         }
         void OnStickEvent()
         {
@@ -76,9 +68,9 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         }
         void Update()
         {
-            lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, Vector3.Lerp(transform.position, objTracker.fishingPoleTip.position, 0.5f) + (Vector3.up * 0.1f));
-            lineRenderer.SetPosition(2, objTracker.fishingPoleTip.position);
+            //lineRenderer.SetPosition(0, transform.position);
+            //lineRenderer.SetPosition(1, Vector3.Lerp(transform.position, objTracker.fishingPoleTip.position, 0.5f) + (Vector3.up * 0.1f));
+            //lineRenderer.SetPosition(2, objTracker.fishingPoleTip.position);
         }
 
         void FixedUpdate()
@@ -113,13 +105,12 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                     projSimple.lifetime = 0.0001f;
 
                 }
+                UpdateHitStop();
             }
         }
         public IEnumerator FlyBack()
         {
-            //Log.Debug("[HOOK] Flyback Start");
-
-            isFlying = true; //aka is being recalled
+            Log.Debug("[BP] Flyback Start");
 
             backpackCollider.enabled = true;
             backpackCollider.gameObject.layer = LayerIndex.noCollision.intVal;
@@ -160,6 +151,63 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             lineRenderer.startWidth = startWidth;
             lineRenderer.endWidth = endWidth;
 
+        }
+
+        bool inHitPause;
+        float hitStopDuration = 0.05f;
+        Vector3 storedVelocity;
+        HitStopCachedState hitStopCachedState;
+        float hitPauseTimer;
+        string playbackRateParam = "SecondaryCast.playbackRate";
+
+        void ApplyHitStop(GameObject gameObject)
+        {
+            if (!inHitPause && ConquerorStaticValues.CurHitStop > 0f)
+            {
+                storedVelocity = objTracker.characterMotor.velocity;
+                hitStopCachedState = CreateHitStopCachedState(objTracker.characterMotor, objTracker.animator, playbackRateParam);
+                hitPauseTimer = ConquerorStaticValues.CurHitStop / objTracker.characterBody.attackSpeed;
+                inHitPause = true;
+            }
+        }
+
+        protected void UpdateHitStop()
+        {
+            hitPauseTimer -= Time.fixedDeltaTime;
+
+            if (hitPauseTimer <= 0f && inHitPause)
+            {
+                RemoveHitstop();
+            }
+
+            if (inHitPause)
+            {
+                objTracker.characterMotor.velocity = Vector3.zero;
+                objTracker.animator.SetFloat(playbackRateParam, 0f);
+            }
+        }
+
+        private void RemoveHitstop()
+        {
+            ConsumeHitStopCachedState(hitStopCachedState, objTracker.characterMotor, objTracker.animator);
+            inHitPause = false;
+            objTracker.characterMotor.velocity = storedVelocity;
+            ConquerorStaticValues.hitStopMod = 1;
+        }
+
+        protected HitStopCachedState CreateHitStopCachedState(CharacterMotor characterMotor, Animator animator, string playbackRateAnimationParameter)
+        {
+            HitStopCachedState result = default(HitStopCachedState);
+            result.characterVelocity = new Vector3(characterMotor.velocity.x, Mathf.Max(0f, characterMotor.velocity.y), characterMotor.velocity.z);
+            result.playbackName = playbackRateAnimationParameter;
+            result.playbackRate = animator.GetFloat(result.playbackName);
+            return result;
+        }
+
+        protected void ConsumeHitStopCachedState(HitStopCachedState hitStopCachedState, CharacterMotor characterMotor, Animator animator)
+        {
+            characterMotor.velocity = hitStopCachedState.characterVelocity;
+            animator.SetFloat(hitStopCachedState.playbackName, hitStopCachedState.playbackRate);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace ConquerorMod.Survivors.Conqueror
         {
             Modules.Content.AddEntityState(typeof(Overpower));
 
-            Modules.Content.AddEntityState(typeof(EyeMunch));
+            Modules.Content.AddEntityState(typeof(Eye));
 
             Modules.Content.AddEntityState(typeof(Advance));
 

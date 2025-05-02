@@ -5,7 +5,6 @@ using On.RoR2.Skills;
 using static EntityStates.BaseState;
 using UnityEngine.Events;
 using ConquerorMod.Survivors.Conqueror.Components;
-using RoR2.HudOverlay;
 
 namespace ConquerorMod.Survivors.Conqueror.Components
 {
@@ -16,14 +15,13 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public RoR2.CharacterMotor characterMotor;
         public Animator animator;
         public Transform fishingPoleTip;
-        OverlayController objectViewerOverlay;
 
         public void Start()
         {
             characterBody = GetComponent<RoR2.CharacterBody>();
             characterMotor = GetComponent<RoR2.CharacterMotor>();
             animator = characterBody.modelLocator.modelTransform.GetComponent<Animator>();
-            fishingPoleTip = characterBody.modelLocator.modelTransform.GetComponent<ChildLocator>().FindChild("PoleEnd");
+            //fishingPoleTip = characterBody.modelLocator.modelTransform.GetComponent<ChildLocator>().FindChild("PoleEnd");
         }
 
         public void RecallAllRopeBackpacks()
@@ -32,7 +30,6 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             {
                 if (backpack) backpack.StartCoroutine(backpack.FlyBack());
             }
-
             deployedBackpack.Clear();
         }
 

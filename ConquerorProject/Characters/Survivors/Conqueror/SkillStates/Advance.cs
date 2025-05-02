@@ -3,6 +3,8 @@ using ConquerorMod.Survivors.Conqueror;
 using ConquerorMod.Modules.BaseStates;
 using RoR2;
 using System;
+using EntityStates.ImpMonster;
+using EntityStates.ImpBossMonster;
 using EntityStates.Huntress;
 using System.Collections.Generic;
 using System.Text;
@@ -11,10 +13,11 @@ using UnityEngine;
 using EntityStates;
 using R2API;
 using RoR2.Skills;
+using static RoR2.BlastAttack;
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
-    public class Advance : BaseConquerorSkillState
+    public class Advance : BaseSkillState
     {
         private GameObject aimSphere;
         //private GameObject aimSphere2;
@@ -63,18 +66,15 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         private void UpdateAreaIndicator()
         {
-            bool isAuthority = base.isAuthority;
-            bool flag = isAuthority;
-            if (flag)
+            if (base.isAuthority)
             {
                 this.aimSphere.transform.localScale = new Vector3(this.radius, this.radius, this.radius);
                 //this.aimSphere2.transform.localScale = new Vector3(this.radius, this.radius, this.radius);
             }
             this.aimRay = base.GetAimRay();
             RaycastHit raycastHit;
-            bool flag2 = Physics.Raycast(base.GetAimRay(), out raycastHit, this.maxDistance, LayerIndex.world.mask | LayerIndex.entityPrecise.mask);
-            bool flag3 = flag2;
-            if (flag3)
+            bool raycast = Physics.Raycast(base.GetAimRay(), out raycastHit, this.maxDistance, LayerIndex.world.mask | LayerIndex.entityPrecise.mask);
+            if (raycast)
             {
                 this.aimSphere.transform.position = raycastHit.point + Vector3.up;
                 this.aimSphere.transform.up = raycastHit.normal;
@@ -96,8 +96,9 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             EffectData effectData = new EffectData();
             effectData.rotation = Util.QuaternionSafeLookRotation(this.aimSphere.transform.position - base.characterBody.corePosition);
             effectData.origin = origin;
-            EffectManager.SpawnEffect(BlinkState.blinkPrefab, effectData, false);
+            EffectManager.SpawnEffect(EntityStates.ImpMonster.BlinkState.blinkPrefab, effectData, false);
         }
+
         public override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -126,14 +127,12 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 Util.PlaySound("Play_voidDevastator_step", base.gameObject);
                 Util.PlaySound("Play_imp_overlord_attack1_impact", base.gameObject);
                 Util.PlaySound("Play_voidman_sprint_start", base.gameObject);
-
             }
         }
 
         public override void OnExit()
         {
             base.OnExit();
-            EntityState.Destroy(this.aimSphere.gameObject);
             //EntityState.Destroy(this.aimSphere2.gameObject);
 
             if (this.charge >= this.chargeDuration)
@@ -150,22 +149,11 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                         procCoefficient = 1f
                     });
                 }
-                if (NetworkServer.active)
-                {
-                    baseMaxSecondaryStock = (float)base.skillLocator.GetSkill(SkillSlot.Secondary).maxStock;
-                    secondaryStock = (float)base.skillLocator.GetSkill(SkillSlot.Secondary).stock;
-                    if (secondaryStock < baseMaxSecondaryStock)
-                    {
-                        GenericSkill skill = base.skillLocator.GetSkill(SkillSlot.Secondary);
-                        int stock = skill.stock;
-                        skill.stock = stock + 1;
-                    }
-                }
             }
 
 
-                bleedblast = new BlastAttack();
-            bleedblast.radius = 8f;
+            bleedblast = new BlastAttack();
+            bleedblast.radius = 10f;
             bleedblast.attacker = gameObject;
             bleedblast.inflictor = gameObject;
             bleedblast.teamIndex = TeamIndex.Player;
@@ -175,17 +163,17 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             bleedblast.falloffModel = BlastAttack.FalloffModel.None;
             if (this.charge >= this.chargeDuration)
             {
-                bleedblast.baseDamage = chargedbleedblastDamageCoefficient;
+                bleedblast.baseDamage = chargedbleedblastDamageCoefficient * damageStat;
             }
             else
             {
-                bleedblast.baseDamage = bleedblastDamageCoefficient;
+                bleedblast.baseDamage = bleedblastDamageCoefficient * damageStat;
             }
             bleedblast.damageType = DamageType.BleedOnHit;
             bleedblast.crit = RollCrit();
             bleedblast.position = this.aimSphere.transform.position;
             bleedblast.Fire();
-            Log.Debug("BleedBlast");
+            //Log.Debug("BleedBlast");
 
             pullblast = new BlastAttack();
             pullblast.radius = 30f;
@@ -193,15 +181,41 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             pullblast.inflictor = gameObject;
             pullblast.teamIndex = TeamIndex.Player;
             pullblast.procCoefficient = 0f;
-            pullblast.baseForce = -2000;
+            //pullblast.baseForce = -2000;
             pullblast.canRejectForce = false;
             pullblast.falloffModel = BlastAttack.FalloffModel.None;
             pullblast.baseDamage = pullblastDamageCoefficient;
             pullblast.damageType = DamageType.Stun1s;
             pullblast.crit = RollCrit();
             pullblast.position = this.aimSphere.transform.position;
-            pullblast.Fire();
-            Log.Debug("PullBlast");
+            BlastAttack.Result targetsHit = pullblast.Fire();
+            //Log.Debug("Targets hit:" + targetsHit.hitCount);
+            for (int i = 0; i < targetsHit.hitCount; i++)
+            {
+                //targetsHit.hitPoints[i].hurtBox 
+                Vector3 targetPosition = this.aimSphere.transform.position;
+                Vector3 startPosition = targetsHit.hitPoints[i].hurtBox.transform.position;
+                CharacterBody body = targetsHit.hitPoints[i].hurtBox.healthComponent.body;
+                bool isFlyer = body.isFlying || (body.characterMotor && (body.characterMotor.isFlying || !body.characterMotor.isGrounded));
+                Vector3 pullforce = GetWarpPullVelocity(targetPosition, startPosition, isFlyer); // (body.rigidbody.mass * .3f);
+                //Log.Debug($"Hit: {targetsHit.hitPoints[i].hurtBox.healthComponent.body.name} Pullforce: {pullforce} IsFlyer: {isFlyer} Mass {body.rigidbody.mass}");
+                if (body.rigidbody)
+                {
+                    if (body.characterMotor)
+                    {
+                        if (body.characterMotor.isGrounded) body.characterMotor.Motor.ForceUnground();
+                        if (!isFlyer) body.characterMotor.disableAirControlUntilCollision = true;
+                        body.characterMotor.velocity = Vector3.zero;
+                        body.characterMotor.velocity = pullforce;
+                    }
+                    else
+                    {
+                        body.rigidbody.AddForce(pullforce, ForceMode.VelocityChange);
+                    }
+                }
+            };
+            //Log.Debug("PullBlast");
+
             base.characterMotor.velocity = Vector3.zero;
             base.characterMotor.Motor.ForceUnground(0.1f);
             SmallHop(characterMotor, 5f);
@@ -214,7 +228,23 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
             Util.PlaySound("Play_imp_attack_blink", gameObject);
             Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
-            this.CreateBlinkEffect(Util.GetCorePosition(base.gameObject));
+            
+
+            EntityState.Destroy(this.aimSphere.gameObject);
+        }
+
+        public Vector3 GetWarpPullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)
+        {
+            Vector3 distanceVector = (targetPos - startPos);
+            Vector2 xzDistanceVec = new Vector2(distanceVector.x, distanceVector.z); // 
+            float distanceToTarget = xzDistanceVec.magnitude;
+            float timeToTarget = Mathf.Min(distanceToTarget * 0.07f, 1);
+
+            Vector2 normailzedDistvec = xzDistanceVec / distanceToTarget;
+            float y = isFlyer ? distanceVector.y : Mathf.Max(Trajectory.CalculateInitialYSpeed(timeToTarget, distanceVector.y), 6);
+            float travelRate = distanceToTarget / timeToTarget;
+            Vector3 direction = new Vector3(normailzedDistvec.x * travelRate, y, normailzedDistvec.y * travelRate);
+            return direction;
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()

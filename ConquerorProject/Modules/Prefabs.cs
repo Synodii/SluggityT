@@ -8,6 +8,7 @@ using static RoR2.CharacterAI.AISkillDriver;
 using RoR2.Skills;
 using System;
 using System.Linq;
+using UnityEngine.AddressableAssets;
 
 namespace ConquerorMod.Modules
 {
@@ -39,6 +40,22 @@ namespace ConquerorMod.Modules
 
             return display;
         }
+
+        public static readonly Dictionary<string, string> ShaderLookup = new Dictionary<string, string>()
+        {
+            {"stubbedror2/base/shaders/hgstandard", "RoR2/Base/Shaders/HGStandard.shader"},
+            {"stubbedror2/base/shaders/hgsnowtopped", "RoR2/Base/Shaders/HGSnowTopped.shader"},
+            {"stubbedror2/base/shaders/hgtriplanarterrainblend", "RoR2/Base/Shaders/HGTriplanarTerrainBlend.shader"},
+            {"stubbedror2/base/shaders/hgintersectioncloudremap", "RoR2/Base/Shaders/HGIntersectionCloudRemap.shader" },
+            {"stubbedror2/base/shaders/hgcloudremap", "RoR2/Base/Shaders/HGCloudRemap.shader" },
+            {"stubbedror2/base/shaders/hgopaquecloudremap", "RoR2/Base/Shaders/HGOpaqueCloudRemap.shader" },
+            {"stubbedror2/base/shaders/hgdistortion", "RoR2/Base/Shaders/HGDistortion.shader" },
+            {"stubbedcalm water/calmwater - dx11 - doublesided", "Calm Water/CalmWater - DX11 - DoubleSided.shader" },
+            {"stubbedcalm water/calmwater - dx11", "Calm Water/CalmWater - DX11.shader" },
+            {"stubbednature/speedtree", "RoR2/Base/Shaders/SpeedTreeCustom.shader"},
+            {"stubbeddecalicious/decaliciousdeferreddecal", "Decalicious/DecaliciousDeferredDecal.shader" },
+            {"stubbedror2/base/shaders/hgforwardplanet", "RoR2/Base/Shaders/HGForwardPlanet.shader" }
+        };
 
         #region body setup
 

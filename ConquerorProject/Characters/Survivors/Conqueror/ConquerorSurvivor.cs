@@ -33,13 +33,16 @@ namespace ConquerorMod.Survivors.Conqueror
 
         public static SteppedSkillDef primaryAxe;
 
-        public static SkillDef secondaryMunch;
-        public static SkillDef secondaryCrush;
+        public static SkillDef secondaryEye;
+        //public static SkillDef secondaryCrush;
 
         public static SkillDef utilityWarp;
 
         public static SkillDef specialRecallRopeBackpack;
         public static SkillDef specialRopeBackpack;
+       
+        public static SkillDef specialRecallApportBackpack;
+        public static SkillDef specialApportBackpack;
 
 
         public override BodyInfo bodyInfo => new BodyInfo
@@ -130,15 +133,20 @@ namespace ConquerorMod.Survivors.Conqueror
         private void AdditionalBodySetup()
         {
             AddHitboxes();
-            bodyPrefab.AddComponent<ConquerorWeaponComponent>();
-            //bodyPrefab.AddComponent<HuntressTrackerComopnent>();
+            bodyPrefab.AddComponent<ConquerorController>();
             //anything else here
         }
 
         public void AddHitboxes()
         {
             //example of how to create a HitBoxGroup. see summary for more details
-            Prefabs.SetupHitBoxGroup(characterModelObject, "SwordGroup", "SwordHitbox");
+            ChildLocator childLocator = characterModelObject.GetComponent<ChildLocator>();
+
+
+            Transform swordHitBoxTransform = childLocator.FindChild("SwordHitbox");
+
+
+            Prefabs.SetupHitBoxGroup(characterModelObject, "SwordGroup", swordHitBoxTransform);
         }
 
         public override void InitializeEntityStateMachines() 
@@ -251,19 +259,19 @@ namespace ConquerorMod.Survivors.Conqueror
             Skills.CreateGenericSkillWithSkillFamily(bodyPrefab, SkillSlot.Secondary);
 
             //here is a basic skill def with all fields accounted for
-            ConquerorSurvivor.secondaryMunch = Skills.CreateSkillDef(new SkillDefInfo
+            ConquerorSurvivor.secondaryEye = Skills.CreateSkillDef(new SkillDefInfo
             {
                 skillName = "ConquerorMunch",
                 skillNameToken = CONQUEROR_PREFIX + "SECONDARY_MUNCH_NAME",
                 skillDescriptionToken = CONQUEROR_PREFIX + "SECONDARY_MUNCH_DESCRIPTION",
-                keywordTokens = new string[] { "KEYWORD_AGILE" },
+                //keywordTokens = new string[] { "KEYWORD_AGILE" },
                 skillIcon = assetBundle.LoadAsset<Sprite>("texSecondaryIcon"),
 
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.EyeMunch)),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Eye)),
                 activationStateMachineName = "Weapon2",
                 interruptPriority = EntityStates.InterruptPriority.Skill,
 
-                baseRechargeInterval = 15f,
+                baseRechargeInterval = 16f,
                 baseMaxStock = 3,
 
                 rechargeStock = 1,
@@ -271,18 +279,51 @@ namespace ConquerorMod.Survivors.Conqueror
                 stockToConsume = 1,
 
                 resetCooldownTimerOnUse = false,
-                fullRestockOnAssign = true,
+                fullRestockOnAssign = false,
+                dontAllowPastMaxStocks = false,
+                mustKeyPress = false,
+                beginSkillCooldownOnSkillEnd = false,
+
+                isCombatSkill = false,
+                canceledFromSprinting = false,
+                cancelSprintingOnActivation = true,
+                forceSprintDuringState = false,
+            });
+
+            /*ConquerorSurvivor.secondaryCrush = Skills.CreateSkillDef(new SkillDefInfo
+            {
+                skillName = "ConquerorCrush",
+                skillNameToken = CONQUEROR_PREFIX + "SECONDARY_CRUSH_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "SECONDARY_CRUSH_DESCRIPTION",
+                //keywordTokens = new string[] { "KEYWORD_AGILE" },
+                skillIcon = assetBundle.LoadAsset<Sprite>("texBazookaFireIcon"),
+
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.EyeCrush)),
+                activationStateMachineName = "Weapon2",
+                interruptPriority = EntityStates.InterruptPriority.Skill,
+
+                baseRechargeInterval = ConquerorSurvivor.secondaryMunch.baseRechargeInterval,
+                baseMaxStock = 3,
+
+                rechargeStock = 1,
+                requiredStock = 1,
+                stockToConsume = 1,
+
+                resetCooldownTimerOnUse = false,
+                fullRestockOnAssign = false,
                 dontAllowPastMaxStocks = false,
                 mustKeyPress = false,
                 beginSkillCooldownOnSkillEnd = false,
 
                 isCombatSkill = true,
                 canceledFromSprinting = false,
-                cancelSprintingOnActivation = false,
+                cancelSprintingOnActivation = true,
                 forceSprintDuringState = false,
-            });
+            });*/
 
-            Skills.AddSecondarySkills(bodyPrefab, secondaryMunch);
+            Skills.AddSecondarySkills(bodyPrefab, secondaryEye);
+            //Skills.AddSecondarySkills(bodyPrefab, secondaryCrush);
+
         }
 
         private void AddUtiitySkills()
@@ -301,7 +342,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 activationStateMachineName = "Body",
                 interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
 
-                baseRechargeInterval = 4f,
+                baseRechargeInterval = 6f,
                 baseMaxStock = 1,
 
                 rechargeStock = 1,
@@ -312,13 +353,13 @@ namespace ConquerorMod.Survivors.Conqueror
                 fullRestockOnAssign = true,
                 dontAllowPastMaxStocks = false,
                 mustKeyPress = false,
-                beginSkillCooldownOnSkillEnd = false,
+                beginSkillCooldownOnSkillEnd = true,
 
-                isCombatSkill = false,
+                isCombatSkill = true,
                 canceledFromSprinting = false,
-                cancelSprintingOnActivation = false,
-                forceSprintDuringState = true,
-            });
+                cancelSprintingOnActivation = true,
+                forceSprintDuringState = false,
+            });;
             Skills.AddUtilitySkills(bodyPrefab, utilityWarp);
         }
 
@@ -339,10 +380,11 @@ namespace ConquerorMod.Survivors.Conqueror
                 activationStateMachineName = "Weapon2", interruptPriority = EntityStates.InterruptPriority.Skill,
 
                 baseMaxStock = 1,
-                baseRechargeInterval = 10f,
+                baseRechargeInterval = 6f,
 
-                isCombatSkill = true,
+                isCombatSkill = false,
                 mustKeyPress = false,
+                cancelSprintingOnActivation = true,
             });
 
             ConquerorSurvivor.specialRecallRopeBackpack = Skills.CreateSkillDef(new SkillDefInfo
@@ -351,18 +393,14 @@ namespace ConquerorMod.Survivors.Conqueror
                 skillNameToken = CONQUEROR_PREFIX + "SPECIAL_RECALLROPEBACKPACK_NAME",
                 skillDescriptionToken = CONQUEROR_PREFIX + "SPECIAL_RECALLROPEBACKPACK_DESCRIPTION",
                 keywordTokens = new string[] { "KEYWORD_AGILE" },
-                skillIcon = assetBundle.LoadAsset<Sprite>("texUtilityIcon"),
+                skillIcon = assetBundle.LoadAsset<Sprite>("texBazookaIcon"),
 
                 activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.RecallRopeBackpacks)),
                 activationStateMachineName = "Weapon2",
                 interruptPriority = EntityStates.InterruptPriority.Skill,
 
-                baseRechargeInterval = 0.5f,
+                baseRechargeInterval = 1f,
                 baseMaxStock = 1,
-
-                rechargeStock = 1,
-                requiredStock = 1,
-                stockToConsume = 1,
 
                 resetCooldownTimerOnUse = false,
                 fullRestockOnAssign = true,
@@ -376,7 +414,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 forceSprintDuringState = false,
             });
 
-            Skills.AddSpecialSkills(bodyPrefab, specialRecallRopeBackpack);
+            //Skills.AddSpecialSkills(bodyPrefab, specialRecallRopeBackpack);
             Skills.AddSpecialSkills(bodyPrefab, specialRopeBackpack);
         }
         #endregion skills
@@ -482,8 +520,8 @@ namespace ConquerorMod.Survivors.Conqueror
             if (sender.HasBuff(ConquerorBuffs.frenzyBuff))
             {
                 frenzybuffCount = sender.GetBuffCount(ConquerorBuffs.frenzyBuff);
-                args.attackSpeedMultAdd += (0.25f * frenzybuffCount);
-                args.moveSpeedMultAdd += 0.2f * frenzybuffCount;
+                args.attackSpeedMultAdd += (0.30f * frenzybuffCount);
+                args.moveSpeedMultAdd += 0.25f * frenzybuffCount;
             }
             if (sender.HasBuff(ConquerorBuffs.intimidateDebuff))
             {

@@ -7,7 +7,8 @@ namespace ConquerorMod.Survivors.Conqueror
     {
         public static BuffDef frenzyBuff;
         public static BuffDef intimidateDebuff;
-        public static BuffDef backpackTrackerHiddenBuff;
+        public static BuffDef eyecountTracker;
+        public static BuffDef eyecooldownTracker;
 
 
         public static void Init(AssetBundle assetBundle)
@@ -15,7 +16,7 @@ namespace ConquerorMod.Survivors.Conqueror
             frenzyBuff = Modules.Content.CreateAndAddBuff("ConquerorFrenziedBuff",
                 LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite,
                 Color.magenta,
-                true,
+                false,
                 false);
 
             intimidateDebuff = Modules.Content.CreateAndAddBuff("ConquerorIntimidatedBuff",
@@ -24,11 +25,17 @@ namespace ConquerorMod.Survivors.Conqueror
                 false,
                 true);
 
-            backpackTrackerHiddenBuff = Modules.Content.CreateAndAddBuff("ConquerorIntimidatedBuff",
+            eyecountTracker = Modules.Content.CreateAndAddBuff("ConquerorEyeCountTracker",
                 LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite,
-                Color.green,
+                Color.red,
+                true,
+                false);
+
+            eyecooldownTracker = Modules.Content.CreateAndAddBuff("ConquerorEyeCDTracker",
+                LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite,
+                Color.gray,
                 false,
-                true);
+                false);
         }
     }
 }

@@ -54,6 +54,17 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             PlayCrossfade("Gesture, Override", "Slash" + (1 + swingIndex), playbackRateParam, duration, 0.1f * duration);
         }
 
+        protected override void FireAttack()
+        {
+            Transform swingPivot = base.FindModelChild("SwingPivot");
+            Ray aimRay = base.GetAimRay();
+            swingPivot.rotation = Util.QuaternionSafeLookRotation(aimRay.direction);
+            if (base.isAuthority)
+            {
+                base.FireAttack();
+            }
+        }
+
         protected override void PlaySwingEffect()
         {
             base.PlaySwingEffect();

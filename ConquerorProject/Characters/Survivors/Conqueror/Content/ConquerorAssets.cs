@@ -77,21 +77,32 @@ namespace ConquerorMod.Survivors.Conqueror
 
         private static void CreateRopeBackpackProjectile()
         {
-            ropeBackpackProjectilePrefab = _assetBundle.LoadAndAddProjectilePrefab("BackPackWardRope");
+            ropeBackpackProjectilePrefab = _assetBundle.LoadAndAddProjectilePrefab("ConquerorRopeWardProjectile");
             ropeBackpackProjectilePrefab.layer = LayerIndex.projectile.intVal;
 
+            Transform thatbuffwardihate = ropeBackpackProjectilePrefab.transform.Find("SirTheresBeenASecondBuffWard");
+
+            LineRenderer lineyboy = ropeBackpackProjectilePrefab.GetComponent<LineRenderer>();
             Rigidbody rb = ropeBackpackProjectilePrefab.GetComponent<Rigidbody>();
-
             ProjectileSimple ps = ropeBackpackProjectilePrefab.GetComponent<ProjectileSimple>();
-
             ProjectileStickOnImpact stickOnImpact = ropeBackpackProjectilePrefab.GetComponent<ProjectileStickOnImpact>();
-
             ProjectileController pc = ropeBackpackProjectilePrefab.GetComponent<ProjectileController>();
-
             CapsuleCollider collider = ropeBackpackProjectilePrefab.GetComponent<CapsuleCollider>();
-
             ProjectileOverlapAttack piss = ropeBackpackProjectilePrefab.GetComponent<ProjectileOverlapAttack>();
+            BuffWard bW1 = ropeBackpackProjectilePrefab.GetComponent<BuffWard>();
+            BuffWard bW2 = thatbuffwardihate.GetComponent<BuffWard>();
 
+            bW1.buffDef = ConquerorBuffs.frenzyBuff;
+            bW2.buffDef = ConquerorBuffs.intimidateDebuff;
+
+            DamageTypeCombo ropeBagDmg = new DamageTypeCombo
+            {
+                damageType = DamageType.Stun1s,
+                damageTypeExtended = DamageTypeExtended.Generic,
+                damageSource = DamageSource.Secondary,
+            };
+            ProjectileDamage projectileDamage = ps.GetComponent<ProjectileDamage>();
+            projectileDamage.damageType = ropeBagDmg;
 
             RopeBackpackController ropePack = ropeBackpackProjectilePrefab.AddComponent<RopeBackpackController>();
             ropePack.rb = rb;
@@ -100,19 +111,9 @@ namespace ConquerorMod.Survivors.Conqueror
             ropePack.backpackCollider = collider;
             ropePack.projOverlap = piss;
             ropePack.projSimple = ps;
-            ropePack.lineRenderer = ropeBackpackProjectilePrefab.AddComponent<LineRenderer>();
+            ropePack.lineRenderer = lineyboy;
 
-            BuffWard buffWard = ropeBackpackProjectilePrefab.AddComponent<BuffWard>();
-            buffWard.radius = 18;
-            buffWard.interval = 1;
-            buffWard.rangeIndicator = null;
-            buffWard.buffDef = ConquerorBuffs.intimidateDebuff;
-            buffWard.buffDuration = 1.5f;
-            buffWard.floorWard = true;
-            buffWard.expires = false;
-            buffWard.invertTeamFilter = true;
-            buffWard.expireDuration = 0;
-            buffWard.animateRadius = false;
+            Log.Debug("Successfully performed CreateRopeBackpackProjectile");
         }
         #endregion projectiles
     }

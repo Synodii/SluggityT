@@ -14,6 +14,9 @@ namespace ConquerorMod.Modules.BaseStates
     {
         public int swingIndex;
 
+        protected static Transform hitBoxOrienter;
+
+
         protected string hitboxGroupName = "SwordGroup";
 
         protected DamageTypeCombo damageType = DamageType.Generic;
@@ -128,9 +131,10 @@ namespace ConquerorMod.Modules.BaseStates
             }
         }
 
-        private void FireAttack()
+
+        protected virtual void FireAttack()
         {
-            if (isAuthority)
+            if (base.isAuthority)
             {
                 if (attack.Fire())
                 {
@@ -138,6 +142,7 @@ namespace ConquerorMod.Modules.BaseStates
                 }
             }
         }
+
 
         private void EnterAttack()
         {

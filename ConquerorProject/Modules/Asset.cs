@@ -65,6 +65,7 @@ namespace ConquerorMod.Modules
             return newTracer;
         }
 
+
         internal static void ConvertAllRenderersToHopooShader(GameObject objectToConvert)
         {
             if (!objectToConvert) return;

@@ -1,28 +1,30 @@
-﻿using EntityStates;
+﻿/*using EntityStates;
 using ConquerorMod.Survivors.Conqueror;
 using RoR2;
 using UnityEngine;
+using R2API;
 using UnityEngine.Networking;
 
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
-/*    public class EyeCrush : BaseSkillState
+    public class EyeCrush : BaseSkillState
     {
-        public static float damageCoefficient = ConquerorStaticValues.offenceeyeDamageCoefficient;
-        public static float procCoefficient = 1f;
-        public static float baseDuration = 0.6f;
+        public static float baseDuration = 1f;
         //delay on firing is usually ass-feeling. only set this if you know what you're doing
-        public static float firePercentTime = 0.0f;
-        public static float force = 800f;
-        public static float recoil = 3f;
-        public static float range = 256f;
-        public static GameObject tracerEffectPrefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/Tracers/TracerGoldGat");
+        // I KNOW WHAT IM DOING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        public static float firePercentTime = 1f;
 
         private float duration;
         private float fireTime;
         private bool hasFired;
         private string muzzleString;
+        private float baseMaxUtilityStock;
+        private float utilityStock;
+
+        private BlastAttack eyeblast;
+        private float eyeblastDamageCoefficient = ConquerorStaticValues.offenceeyeDamageCoefficient;
+
 
         public override void OnEnter()
         {
@@ -31,22 +33,42 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             fireTime = firePercentTime * duration;
             characterBody.SetAimTimer(2f);
             muzzleString = "Muzzle";
+            hasFired = false;
 
-            PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1.8f);
+            Util.PlaySound("Play_ui_obj_eradicator_open", gameObject);
+            Util.PlaySound("Play_chef_skill1_return", gameObject);
+            Util.PlaySound("Play_scav_backpack_open", gameObject);
+
+
+
+            PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1f);
         }
 
         public override void OnExit()
         {
+            if (NetworkServer.active)
+            {
+                baseMaxUtilityStock = (float)base.skillLocator.GetSkill(SkillSlot.Utility).maxStock;
+                utilityStock = (float)base.skillLocator.GetSkill(SkillSlot.Utility).stock;
+                if (utilityStock < baseMaxUtilityStock)
+                {
+                    GenericSkill skill = base.skillLocator.GetSkill(SkillSlot.Utility);
+                    int stock = skill.stock;
+                    skill.stock = stock + 1;
+                }
+            }
             base.OnExit();
         }
 
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-
-            if (fixedAge >= fireTime)
+            if (!hasFired)
             {
-                Fire();
+                if (fixedAge >= fireTime)
+                {
+                    Fire();
+                }
             }
 
             if (fixedAge >= duration && isAuthority)
@@ -58,50 +80,29 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         private void Fire()
         {
-            if (!hasFired)
+            if (NetworkServer.active)
             {
+                Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
+                Util.PlaySound("Play_gup_step", gameObject);
+                Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+
+                eyeblast = new BlastAttack();
+                eyeblast.radius = 13f;
+                eyeblast.attacker = gameObject;
+                eyeblast.inflictor = gameObject;
+                eyeblast.teamIndex = TeamIndex.Player;
+                eyeblast.procCoefficient = 1f;
+                eyeblast.baseForce = 300;
+                eyeblast.canRejectForce = false;
+                eyeblast.falloffModel = BlastAttack.FalloffModel.None;
+                eyeblast.baseDamage = eyeblastDamageCoefficient * damageStat;
+                eyeblast.damageType = DamageType.BleedOnHit;
+                eyeblast.crit = RollCrit();
+                eyeblast.position = this.characterBody.transform.position;
+                eyeblast.Fire();
+                Log.Debug("EyeBlast");
+
                 hasFired = true;
-
-                characterBody.AddSpreadBloom(1.5f);
-                EffectManager.SimpleMuzzleFlash(EntityStates.Commando.CommandoWeapon.FirePistol2.muzzleEffectPrefab, gameObject, muzzleString, false);
-                Util.PlaySound("HenryShootPistol", gameObject);
-
-                if (isAuthority)
-                {
-                    Ray aimRay = GetAimRay();
-                    AddRecoil(-1f * recoil, -2f * recoil, -0.5f * recoil, 0.5f * recoil);
-
-                    new BulletAttack
-                    {
-                        bulletCount = 1,
-                        aimVector = aimRay.direction,
-                        origin = aimRay.origin,
-                        damage = damageCoefficient * damageStat,
-                        damageColorIndex = DamageColorIndex.Default,
-                        damageType = DamageTypeCombo.GenericSecondary,
-                        falloffModel = BulletAttack.FalloffModel.None,
-                        maxDistance = range,
-                        force = force,
-                        hitMask = LayerIndex.CommonMasks.bullet,
-                        minSpread = 0f,
-                        maxSpread = 0f,
-                        isCrit = RollCrit(),
-                        owner = gameObject,
-                        muzzleName = muzzleString,
-                        smartCollision = true,
-                        procChainMask = default,
-                        procCoefficient = procCoefficient,
-                        radius = 0.75f,
-                        sniper = false,
-                        stopperMask = LayerIndex.CommonMasks.bullet,
-                        weapon = null,
-                        tracerEffectPrefab = tracerEffectPrefab,
-                        spreadPitchScale = 1f,
-                        spreadYawScale = 1f,
-                        queryTriggerInteraction = QueryTriggerInteraction.UseGlobal,
-                        hitEffectPrefab = EntityStates.Commando.CommandoWeapon.FirePistol2.hitEffectPrefab,
-                    }.Fire();
-                }
             }
         }
 
@@ -109,5 +110,5 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             return InterruptPriority.PrioritySkill;
         }
-    }*/
-}
+    }
+}*/

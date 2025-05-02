@@ -47,7 +47,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Primary
             Language.Add(prefix + "PRIMARY_AXE_NAME", "Overpower");
-            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", Tokens.agilePrefix + $"Swing forward for <style=cIsDamage>{100f * ConquerorStaticValues.swingDamageCoefficient}% damage</style>. Every 3rd hit has <style=cIsDamage>Slayer</style>.");
+            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", $"Swing forward for <style=cIsDamage>{100f * ConquerorStaticValues.swingDamageCoefficient}% damage</style>. Every 3rd hit has <style=cIsDamage>Slayer</style>.");
             #endregion
 
             #region Secondary
