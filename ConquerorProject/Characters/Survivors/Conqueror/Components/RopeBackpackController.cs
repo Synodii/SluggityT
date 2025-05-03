@@ -27,7 +27,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
         bool isFlying = false;
         float distanceToOwner;
-        float autoTriggerDistance = 20;
+        float autoTriggerDistance = 2000;
         float homeToBodyDistance = 50;
         float homingForce = 5f;
         float homingDeceleration = 0.33f;
@@ -36,7 +36,6 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         float timeFlying = 0;
         float minTimeBeforeReturning = 0.25f;
         float maxFlyTime = 2;
-        float BackpackTossVelocity = 30f;
 
         void Awake()
         {
@@ -48,8 +47,8 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             objTracker = ownerTransform.GetComponent<ObjectTracker>();
             objTracker.deployedBackpack.Add(this);
             backpackCollider.enabled = true;
-            stickComponent.stickEvent.AddListener(OnStickEvent);
             projectileDamage.force = 0;
+            stickComponent.stickEvent.AddListener(OnStickEvent);
             projOverlap.onServerHit.AddListener(() => ApplyHitStop(null));
         }
         void OnStickEvent()
@@ -111,6 +110,9 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public IEnumerator FlyBack()
         {
             Log.Debug("[BP] Flyback Start");
+
+            isFlying = true; //aka is being recalled
+
 
             backpackCollider.enabled = true;
             backpackCollider.gameObject.layer = LayerIndex.noCollision.intVal;

@@ -6,6 +6,7 @@ using UnityEngine;
 using R2API;
 using UnityEngine.Networking;
 using ConquerorMod.Survivors.Conqueror.Components;
+using System.Collections;
 
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
@@ -26,10 +27,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         private float baseMaxUtilityStock;
         private float utilityStock;
 
-        private BlastAttack eyeblastpull;
-        private BlastAttack eyeblastbleed;
-
-        private float eyeblastDamageCoefficient = ConquerorStaticValues.offenceeyeDamageCoefficient;
+        private BlastAttack secondaryeyeblast;
+        private BlastAttack eyeblastinit;
 
         public override void OnEnter()
         {
@@ -98,6 +97,30 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             }
         }
 
+        private IEnumerator ExplodeEnemyAfterDelay(CharacterBody nmebody, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            secondaryeyeblast = new BlastAttack();
+            secondaryeyeblast.radius = 6.5f;
+            secondaryeyeblast.attacker = gameObject;
+            secondaryeyeblast.inflictor = gameObject;
+            secondaryeyeblast.teamIndex = TeamIndex.Player;
+            secondaryeyeblast.procCoefficient = 1f;
+            //eyeblastpull.baseForce = -2000;
+            secondaryeyeblast.canRejectForce = false;
+            secondaryeyeblast.falloffModel = BlastAttack.FalloffModel.Linear;
+            secondaryeyeblast.baseDamage = ConquerorStaticValues.eyeblastsecondaryblastDamageCoefficient * damageStat;
+            secondaryeyeblast.damageType = DamageType.BleedOnHit;
+            secondaryeyeblast.crit = RollCrit();
+            secondaryeyeblast.position = nmebody.corePosition;
+            secondaryeyeblast.Fire();
+
+            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+            Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+
+        }
+
         private void Fire()
         {
             if (NetworkServer.active)
@@ -122,71 +145,41 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
                     Util.PlaySound("Play_gup_step", gameObject);
                     Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+                    Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
 
-                    eyeblastbleed = new BlastAttack();
-                    eyeblastbleed.radius = 10f;
-                    eyeblastbleed.attacker = gameObject;
 
-                    eyeblastbleed.inflictor = gameObject;
-                    eyeblastbleed.teamIndex = TeamIndex.Player;
-                    eyeblastbleed.procCoefficient = 1f;
-                    eyeblastbleed.baseForce = 300;
-                    eyeblastbleed.canRejectForce = false;
-                    eyeblastbleed.falloffModel = BlastAttack.FalloffModel.None;
-                    eyeblastbleed.baseDamage = ConquerorStaticValues.offenceeyeDamageCoefficient * damageStat;
-                    eyeblastbleed.damageType = DamageType.BleedOnHit;
-                    eyeblastbleed.crit = RollCrit();
-                    eyeblastbleed.position = this.characterBody.corePosition;
-                    eyeblastbleed.Fire();
-                    //Log.Debug("eyeblastbleed");
+                    eyeblastinit = new BlastAttack();
+                    eyeblastinit.radius = 18f;
+                    eyeblastinit.attacker = gameObject;
 
-                    eyeblastpull = new BlastAttack();
-                    eyeblastpull.radius = 30f;
-                    eyeblastpull.attacker = gameObject;
-                    eyeblastpull.inflictor = gameObject;
-                    eyeblastpull.teamIndex = TeamIndex.Player;
-                    eyeblastpull.procCoefficient = 0f;
-                    //eyeblastpull.baseForce = -2000;
-                    eyeblastpull.canRejectForce = false;
-                    eyeblastpull.falloffModel = BlastAttack.FalloffModel.None;
-                    eyeblastpull.baseDamage = 0;
-                    eyeblastpull.damageType = DamageType.Stun1s;
-                    eyeblastpull.crit = RollCrit();
-                    eyeblastpull.position = this.characterBody.footPosition;
-                    BlastAttack.Result targetsHit = eyeblastpull.Fire();
-                    //Log.Debug("Targets hit:" + targetsHit.hitCount);
+                    eyeblastinit.inflictor = gameObject;
+                    eyeblastinit.teamIndex = TeamIndex.Player;
+                    eyeblastinit.procCoefficient = 1f;
+                    eyeblastinit.baseForce = 300;
+                    eyeblastinit.canRejectForce = false;
+                    eyeblastinit.falloffModel = BlastAttack.FalloffModel.None;
+                    eyeblastinit.baseDamage = ConquerorStaticValues.eyeblastinitDamageCoefficient * damageStat;
+                    eyeblastinit.damageType = DamageType.Generic;
+                    eyeblastinit.crit = RollCrit();
+                    eyeblastinit.position = this.characterBody.corePosition;
+                    
+                    BlastAttack.Result targetsHit = eyeblastinit.Fire();
+                    Log.Debug("Targets hit:" + targetsHit.hitCount);
                     for (int i = 0; i < targetsHit.hitCount; i++)
                     {
-                        //targetsHit.hitPoints[i].hurtBox 
-                        Vector3 targetPosition = this.characterBody.footPosition;
-                        Vector3 startPosition = targetsHit.hitPoints[i].hurtBox.transform.position;
-                        CharacterBody body = targetsHit.hitPoints[i].hurtBox.healthComponent.body;
-                        bool isFlyer = body.isFlying || (body.characterMotor && (body.characterMotor.isFlying || !body.characterMotor.isGrounded));
-                        Vector3 pullforce = GetEyePullVelocity(targetPosition, startPosition, isFlyer); // (body.rigidbody.mass * .3f);
-                                                                                                         //Log.Debug($"Hit: {targetsHit.hitPoints[i].hurtBox.healthComponent.body.name} Pullforce: {pullforce} IsFlyer: {isFlyer} Mass {body.rigidbody.mass}");
-                        if (body.rigidbody)
-                        {
-                            if (body.characterMotor)
-                            {
-                                if (body.characterMotor.isGrounded) body.characterMotor.Motor.ForceUnground();
-                                if (!isFlyer) body.characterMotor.disableAirControlUntilCollision = true;
-                                body.characterMotor.velocity = Vector3.zero;
-                                body.characterMotor.velocity = pullforce;
-                            }
-                            else
-                            {
-                                body.rigidbody.AddForce(pullforce, ForceMode.VelocityChange);
-                            }
-                        }
-                    };
-                    //Log.Debug("EyeBlast");
+                        HealthComponent hc = targetsHit.hitPoints[i].hurtBox.healthComponent;
+                        CharacterBody nmebody = hc.body;
 
+                        float delay = UnityEngine.Random.Range(1f, 1.5f);
+                        RoR2.Run.instance.StartCoroutine(ExplodeEnemyAfterDelay(nmebody, delay));
+
+                    }
                     hasFired = true;
                 }
             }
         }
 
-        public Vector3 GetEyePullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)
+        /*public Vector3 GetEyePullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)
         {
             Vector3 distanceVector = (targetPos - startPos);
             Vector2 xzDistanceVec = new Vector2(distanceVector.x, distanceVector.z); // 
@@ -198,8 +191,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             float travelRate = distanceToTarget / timeToTarget;
             Vector3 direction = new Vector3(normailzedDistvec.x * travelRate, y, normailzedDistvec.y * travelRate);
             return direction;
-        }
-
+        }*/
         private void CreateBlinkEffect(Vector3 origin)
         {
             EffectData effectData = new EffectData();

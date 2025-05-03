@@ -14,14 +14,14 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public RoR2.CharacterBody characterBody;
         public RoR2.CharacterMotor characterMotor;
         public Animator animator;
-        public Transform fishingPoleTip;
+        public Transform swordTip;
 
         public void Start()
         {
             characterBody = GetComponent<RoR2.CharacterBody>();
             characterMotor = GetComponent<RoR2.CharacterMotor>();
             animator = characterBody.modelLocator.modelTransform.GetComponent<Animator>();
-            //fishingPoleTip = characterBody.modelLocator.modelTransform.GetComponent<ChildLocator>().FindChild("PoleEnd");
+            swordTip = characterBody.modelLocator.modelTransform.GetComponent<ChildLocator>().FindChild("PoleEnd");
         }
 
         public void RecallAllRopeBackpacks()

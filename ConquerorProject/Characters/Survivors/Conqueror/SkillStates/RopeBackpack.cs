@@ -56,7 +56,6 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             fireProjectileInfo.rotation = Quaternion.identity;
             fireProjectileInfo.damage = damageCoefficient * damageStat;
             ProjectileManager.instance.FireProjectile(fireProjectileInfo);
-
         }
     }
 }
