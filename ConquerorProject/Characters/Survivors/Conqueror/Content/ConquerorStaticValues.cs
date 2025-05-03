@@ -19,7 +19,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
         public const float eyeblastsecondaryblastDamageCoefficient = 2.5f;
 
-        public const float eyeblastinitDamageCoefficient = 1.5f;
+        public const float eyeblastinitDamageCoefficient = .8f;
 
         public const float gigalaserDamageCoefficient = 18f;
 

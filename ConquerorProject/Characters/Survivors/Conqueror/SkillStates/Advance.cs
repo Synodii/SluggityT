@@ -16,6 +16,8 @@ using RoR2.Skills;
 using static RoR2.BlastAttack;
 using System.Collections;
 using UnityEngine.UIElements;
+using ConquerorMod.Survivors.Conqueror.Components;
+
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
@@ -120,7 +122,14 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         private void ChargedSoundplayed()
         {
-            if (!this.isCharged && this.charge >= this.chargeDuration)
+            if (characterBody.GetComponent<ConquerorController>().bagDeployed == true)
+            {
+                this.isCharged = true;
+                Util.PlaySound("Play_voidDevastator_step", base.gameObject);
+                Util.PlaySound("Play_imp_overlord_attack1_impact", base.gameObject);
+                Util.PlaySound("Play_voidman_sprint_start", base.gameObject);
+            }    
+            else if (!this.isCharged && this.charge >= this.chargeDuration)
             {
                 this.isCharged = true;
                 Util.PlaySound("Play_voidDevastator_step", base.gameObject);
@@ -134,23 +143,6 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             base.OnExit();
             //EntityState.Destroy(this.aimSphere2.gameObject);
 
-            if (this.charge >= this.chargeDuration)
-            {
-                if (NetworkServer.active && healthComponent)
-                {
-                    healthComponent.TakeDamage(new DamageInfo
-                    {
-                        damage = healthComponent.combinedHealth * .3f,
-                        position = characterBody.corePosition,
-                        attacker = null,
-                        inflictor = null,
-                        damageType = DamageType.NonLethal | DamageType.BypassArmor,
-                        procCoefficient = 1f
-                    });
-                }
-            }
-
-
             bleedblast = new BlastAttack();
             bleedblast.radius = 10f;
             bleedblast.attacker = gameObject;
@@ -159,27 +151,52 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             bleedblast.procCoefficient = 1f;
             bleedblast.baseForce = 300;
             bleedblast.canRejectForce = false;
-            bleedblast.falloffModel = BlastAttack.FalloffModel.None;
-            if (this.charge >= this.chargeDuration)
-            {
-                bleedblast.baseDamage = chargedbleedblastDamageCoefficient * damageStat;
-            }
-            else
-            {
-                bleedblast.baseDamage = bleedblastDamageCoefficient * damageStat;
-            }
+            bleedblast.falloffModel = BlastAttack.FalloffModel.None; 
+            bleedblast.baseDamage = bleedblastDamageCoefficient * damageStat;
             bleedblast.damageType = DamageType.BleedOnHit;
             bleedblast.crit = RollCrit();
             bleedblast.position = this.aimSphere.transform.position;
             bleedblast.Fire();
             //Log.Debug("BleedBlast");
 
+            if (characterBody.GetComponent<ConquerorController>().bagDeployed == false)
+            {
+                if (this.charge >= this.chargeDuration)
+                {
+                    ChargedEffect();
+                }
+            }
+            else
+            {
+                ChargedEffect();
+            }
+
+            base.characterMotor.velocity = Vector3.zero;
+            base.characterMotor.Motor.ForceUnground(0.1f);
+            SmallHop(characterMotor, 5f);
+
+            if (NetworkServer.active)
+            {
+                Util.CleanseBody(base.characterBody, true, false, false, true, true, true);
+            }
+
+            Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+            Util.PlaySound("Play_imp_attack_blink", gameObject);
+            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
+            Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
+
+
+            EntityState.Destroy(this.aimSphere.gameObject);
+        }
+
+        private void ChargedEffect()
+        {
             pullblast = new BlastAttack();
             pullblast.radius = 30f;
             pullblast.attacker = gameObject;
             pullblast.inflictor = gameObject;
             pullblast.teamIndex = TeamIndex.Player;
-            pullblast.procCoefficient = 0.01f;
+            pullblast.procCoefficient = 0;
             //pullblast.baseForce = -2000;
             pullblast.canRejectForce = false;
             pullblast.falloffModel = BlastAttack.FalloffModel.None;
@@ -212,17 +229,18 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     targetPosition = hit.point + Vector3.up * 0.1f;
                 }
 
-                EffectData effectData = new EffectData
+                /*EffectData effectData = new EffectData
                 {
                     origin = targetPosition,
                     scale = 1f, // radius of effect
                     rotation = Quaternion.identity
                 };
 
-                EffectManager.SpawnEffect(LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/OmniExplosionVFX"), effectData, true);
+                EffectManager.SpawnEffect(LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/OmniExplosionVFX"), effectData, true);*/
 
                 float delay = UnityEngine.Random.Range(1f, 1.3f);
                 RoR2.Run.instance.StartCoroutine(TeleportEnemyAfterDelay(nmebody, targetPosition, delay));
+                //old pullforce code
                 /*if (nmebody.rigidbody)
                 {
                     nmebody.characterMotor.Motor.SetPosition(targetPosition);
@@ -237,53 +255,24 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
                 Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);*/
 
+
             }
 
-            /*for (int i = 0; i < targetsHit.hitCount; i++)
-            {
-                //targetsHit.hitPoints[i].hurtBox 
-                Vector3 targetPosition = this.aimSphere.transform.position;
-                Vector3 startPosition = targetsHit.hitPoints[i].hurtBox.transform.position;
-                CharacterBody body = targetsHit.hitPoints[i].hurtBox.healthComponent.body;
-                bool isFlyer = body.isFlying || (body.characterMotor && (body.characterMotor.isFlying || !body.characterMotor.isGrounded));
-                Vector3 pullforce = GetWarpPullVelocity(targetPosition, startPosition, isFlyer); // (body.rigidbody.mass * .3f);
-                //Log.Debug($"Hit: {targetsHit.hitPoints[i].hurtBox.healthComponent.body.name} Pullforce: {pullforce} IsFlyer: {isFlyer} Mass {body.rigidbody.mass}");
-                if (body.rigidbody)
-                {
-                    if (body.characterMotor)
-                    {
-                        if (body.characterMotor.isGrounded) body.characterMotor.Motor.ForceUnground();
-                        if (!isFlyer) body.characterMotor.disableAirControlUntilCollision = true;
-                        body.characterMotor.velocity = Vector3.zero;
-                        body.characterMotor.velocity = pullforce;
-                    }
-                    else
-                    {
-                        body.rigidbody.AddForce(pullforce, ForceMode.VelocityChange);
-                    }
-                }
-            };*/
-            //Log.Debug("PullBlast");
-
-            base.characterMotor.velocity = Vector3.zero;
-            base.characterMotor.Motor.ForceUnground(0.1f);
-            SmallHop(characterMotor, 5f);
-
-            if (NetworkServer.active)
+            if (NetworkServer.active && healthComponent)
             {
                 Util.CleanseBody(base.characterBody, true, false, false, true, true, true);
+
+                healthComponent.TakeDamage(new DamageInfo
+                {
+                    damage = healthComponent.combinedHealth * .3f,
+                    position = characterBody.corePosition,
+                    attacker = null,
+                    inflictor = null,
+                    damageType = DamageType.NonLethal | DamageType.BypassArmor,
+                    procCoefficient = 1f
+                });
             }
-
-            Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
-            Util.PlaySound("Play_imp_attack_blink", gameObject);
-            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
-            Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
-
-
-            EntityState.Destroy(this.aimSphere.gameObject);
         }
-
-
         private IEnumerator TeleportEnemyAfterDelay(CharacterBody nmebody, Vector3 targetPosition, float delay)
         {
             yield return new WaitForSeconds(delay);
@@ -300,7 +289,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 nmebody.transform.position = targetPosition;
             }
 
-            Util.PlaySound("Play_imp_attack_blink", nmebody.gameObject);
+            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+            
         }
 
         /*public Vector3 GetWarpPullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)

@@ -18,17 +18,19 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             if (base.isAuthority) 
             {
-                base.skillLocator.special.UnsetSkillOverride(gameObject, ConquerorSurvivor.specialRecallRopeBackpack, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
+                var controller = characterBody.GetComponent<ConquerorController>();
+                if (controller) controller.ResetRopeSkill();
+
+                characterBody.GetComponent<ConquerorController>().isManualRecall = true;
+
                 base.skillLocator.special.DeductStock(1);
-                ObjectTracker objt = characterBody.GetComponent<ObjectTracker>();
+                ConquerorController objt = characterBody.GetComponent<ConquerorController>();
                 if (objt)
                 {
                     objt.animator = base.GetModelAnimator();
                     objt.RecallAllRopeBackpacks();
                 }
                 PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1f);
-
-                characterBody.GetComponent<ConquerorController>().bagDeployed = false;
             }
 
             outer.SetNextStateToMain();

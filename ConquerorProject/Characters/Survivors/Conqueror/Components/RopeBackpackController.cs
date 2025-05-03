@@ -7,6 +7,7 @@ using static EntityStates.BaseState;
 using EntityStates;
 using UnityEngine.Events;
 using ConquerorMod.Survivors.Conqueror.Components;
+using ConquerorMod.Survivors.Conqueror.SkillStates;
 
 
 namespace ConquerorMod.Survivors.Conqueror.Components
@@ -23,11 +24,11 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public LineRenderer lineRenderer;
         public BuffWard buffward;
 
-        ObjectTracker objTracker;
+        ConquerorController objTracker;
 
         bool isFlying = false;
         float distanceToOwner;
-        float autoTriggerDistance = 2000;
+        float autoTriggerDistance = 25;
         float homeToBodyDistance = 50;
         float homingForce = 5f;
         float homingDeceleration = 0.33f;
@@ -44,12 +45,11 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         void Start()
         {
             ownerTransform = controller.owner.transform;
-            objTracker = ownerTransform.GetComponent<ObjectTracker>();
+            objTracker = ownerTransform.GetComponent<ConquerorController>();
             objTracker.deployedBackpack.Add(this);
             backpackCollider.enabled = true;
             projectileDamage.force = 0;
             stickComponent.stickEvent.AddListener(OnStickEvent);
-            projOverlap.onServerHit.AddListener(() => ApplyHitStop(null));
         }
         void OnStickEvent()
         {
@@ -78,6 +78,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             distanceToOwner = Vector3.Distance(transform.position, ownerTransform.position);
             if (!isFlying && distanceToOwner > autoTriggerDistance)
             {
+                objTracker.isManualRecall = false;
                 StartCoroutine(FlyBack());
             }
             if (isFlying)
@@ -102,14 +103,18 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                 if (distanceToOwner <= 3)
                 {
                     projSimple.lifetime = 0.0001f;
-
+                    if (!objTracker.isManualRecall)
+                    {
+                        objTracker.ResetRopeSkill();
+                    }
                 }
-                UpdateHitStop();
             }
         }
         public IEnumerator FlyBack()
         {
             Log.Debug("[BP] Flyback Start");
+            Util.PlaySound("Play_scav_backpack_open", gameObject);
+
 
             isFlying = true; //aka is being recalled
 
@@ -161,55 +166,5 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         HitStopCachedState hitStopCachedState;
         float hitPauseTimer;
         string playbackRateParam = "SecondaryCast.playbackRate";
-
-        void ApplyHitStop(GameObject gameObject)
-        {
-            if (!inHitPause && ConquerorStaticValues.CurHitStop > 0f)
-            {
-                storedVelocity = objTracker.characterMotor.velocity;
-                hitStopCachedState = CreateHitStopCachedState(objTracker.characterMotor, objTracker.animator, playbackRateParam);
-                hitPauseTimer = ConquerorStaticValues.CurHitStop / objTracker.characterBody.attackSpeed;
-                inHitPause = true;
-            }
-        }
-
-        protected void UpdateHitStop()
-        {
-            hitPauseTimer -= Time.fixedDeltaTime;
-
-            if (hitPauseTimer <= 0f && inHitPause)
-            {
-                RemoveHitstop();
-            }
-
-            if (inHitPause)
-            {
-                objTracker.characterMotor.velocity = Vector3.zero;
-                objTracker.animator.SetFloat(playbackRateParam, 0f);
-            }
-        }
-
-        private void RemoveHitstop()
-        {
-            ConsumeHitStopCachedState(hitStopCachedState, objTracker.characterMotor, objTracker.animator);
-            inHitPause = false;
-            objTracker.characterMotor.velocity = storedVelocity;
-            ConquerorStaticValues.hitStopMod = 1;
-        }
-
-        protected HitStopCachedState CreateHitStopCachedState(CharacterMotor characterMotor, Animator animator, string playbackRateAnimationParameter)
-        {
-            HitStopCachedState result = default(HitStopCachedState);
-            result.characterVelocity = new Vector3(characterMotor.velocity.x, Mathf.Max(0f, characterMotor.velocity.y), characterMotor.velocity.z);
-            result.playbackName = playbackRateAnimationParameter;
-            result.playbackRate = animator.GetFloat(result.playbackName);
-            return result;
-        }
-
-        protected void ConsumeHitStopCachedState(HitStopCachedState hitStopCachedState, CharacterMotor characterMotor, Animator animator)
-        {
-            characterMotor.velocity = hitStopCachedState.characterVelocity;
-            animator.SetFloat(hitStopCachedState.playbackName, hitStopCachedState.playbackRate);
-        }
     }
 }

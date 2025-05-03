@@ -53,6 +53,9 @@ namespace ConquerorMod.Survivors.Conqueror
             #region Secondary
             Language.Add(prefix + "SECONDARY_MUNCH_NAME", "Imbibe");
             Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>. <style=cIsUtility>Becomes Smother while Special is active.</style>");
+
+            Language.Add(prefix + "SECONDARY_CRUSH_NAME", "Smother");
+            Language.Add(prefix + "SECONDARY_CRUSH_DESCRIPTION", Tokens.agilePrefix + $"insert token here");
             #endregion
 
             #region Utility

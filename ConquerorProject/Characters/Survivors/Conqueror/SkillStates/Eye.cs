@@ -117,7 +117,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             secondaryeyeblast.Fire();
 
             Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
-            Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+            Util.PlaySound("Play_imp_overlord_attack1_pop", nmebody.gameObject);
+            Util.PlaySound("Play_voidDevastator_step", nmebody.gameObject);
 
         }
 
@@ -130,6 +131,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     ProcChainMask procChainMask = default(ProcChainMask);
                     Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
                     Util.PlaySound("Play_gup_step", gameObject);
+                    Util.PlaySound("Play_voidDevastator_step", gameObject);
                     //Util.PlaySound("Play_ui_obj_eradicator_open", base.gameObject);
 
                     characterBody.AddTimedBuff(ConquerorBuffs.frenzyBuff, 4f);
@@ -142,19 +144,19 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 }
                 else
                 {
-                    Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
                     Util.PlaySound("Play_gup_step", gameObject);
                     Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+                    Util.PlaySound("Play_voidDevastator_step", base.gameObject);
                     Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
 
 
                     eyeblastinit = new BlastAttack();
-                    eyeblastinit.radius = 18f;
+                    eyeblastinit.radius = 15f;
                     eyeblastinit.attacker = gameObject;
 
                     eyeblastinit.inflictor = gameObject;
                     eyeblastinit.teamIndex = TeamIndex.Player;
-                    eyeblastinit.procCoefficient = 1f;
+                    eyeblastinit.procCoefficient = .6f;
                     eyeblastinit.baseForce = 300;
                     eyeblastinit.canRejectForce = false;
                     eyeblastinit.falloffModel = BlastAttack.FalloffModel.None;
