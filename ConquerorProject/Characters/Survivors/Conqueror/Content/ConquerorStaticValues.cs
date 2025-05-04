@@ -15,7 +15,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
         public const float warpDamageCoefficient = 2.5f;
 
-        public const float chargedwarpDamageCoefficient = 5f;
+        //public const float chargedwarpDamageCoefficient = 5f;
 
         public const float eyeblastsecondaryblastDamageCoefficient = 2.5f;
 
@@ -26,5 +26,7 @@ namespace ConquerorMod.Survivors.Conqueror
         public const float ropeduffelretrieveDamageCoefficient = 2f;
 
         public const float apportduffelretrieveDamageCoefficient = 2f;
+
+        public const float autoRecallDistance = 18;
     }
 }

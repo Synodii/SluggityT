@@ -14,7 +14,19 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         public override void OnEnter()
         {
             projectilePrefab = ConquerorAssets.ropeBackpackProjectilePrefab;
-            damageCoefficient = 0;
+            if (projectilePrefab != null)
+            {
+                Log.Debug($"[Test] Firing projectile: {projectilePrefab.name}");
+                if (!projectilePrefab.GetComponent<RopeBackpackController>())
+                {
+                    Log.Debug("[Test] RopeBackpackController is NOT on the prefab!");
+                }
+                else
+                {
+                    Log.Debug("[Test] RopeBackpackController is present on the prefab.");
+                }
+            }
+
             baseDuration = 0.4f;
             force = 0f;
             recoilAmplitude = 0.1f;
@@ -38,6 +50,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
             outer.SetNextStateToMain();
         }
+
+
 
         public override void FixedUpdate()
         {

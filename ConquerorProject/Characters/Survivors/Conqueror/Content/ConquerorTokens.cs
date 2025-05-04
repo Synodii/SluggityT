@@ -60,7 +60,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Utility
             Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
-            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, <style=cIsUtility>cleanse debuffs</style> and deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> and <style=cIsUtility>pulling</style> in enemies. At full charge, incur <style=cIsHealth>30% health</style>, <style=cIsUtility>refill a secondary stock,</style> and deal <style=cIsDamage>{100f * ConquerorStaticValues.chargedwarpDamageCoefficient}% damage</style> instead.");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, <style=cIsUtility>cleanse debuffs</style> and deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> and <style=cIsUtility>pulling</style> in enemies. At full charge, incur <style=cIsHealth>30% health</style>, <style=cIsUtility>refill a secondary stock,</style> and deal <style=cIsDamage>{100f}% damage</style> instead.");
             #endregion
 
             #region Special

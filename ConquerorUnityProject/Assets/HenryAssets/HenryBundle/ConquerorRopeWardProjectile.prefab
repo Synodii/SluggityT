@@ -27,12 +27,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 129033759494941463}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2.1, y: 2.1, z: 2.1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1403925749102536259}
-  m_RootOrder: 1
+  m_Father: {fileID: 3301171250300925908}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3380229075046570166
 MeshFilter:
@@ -93,7 +93,7 @@ SphereCollider:
   m_GameObject: {fileID: 129033759494941463}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -110,16 +110,13 @@ GameObject:
   - component: {fileID: 8024213377569821070}
   - component: {fileID: 1762487280706769996}
   - component: {fileID: 3817410182836057342}
-  - component: {fileID: 1198139924832023944}
   - component: {fileID: 4318101263965832616}
   - component: {fileID: -4498418834231623061}
   - component: {fileID: 5252476097462176173}
   - component: {fileID: 787398814753937342}
   - component: {fileID: 2948530433287243690}
-  - component: {fileID: 8986658253201828638}
   - component: {fileID: 2136942011095693304}
   - component: {fileID: 4984961327163980566}
-  - component: {fileID: 8966919121035823668}
   m_Layer: 14
   m_Name: ConquerorRopeWardProjectile
   m_TagString: Untagged
@@ -134,17 +131,17 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3931918477765718896}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7830291479835273667}
-  - {fileID: 8875573876603233852}
   - {fileID: 4403734822202101431}
+  - {fileID: 3301171250300925908}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 270, y: 0, z: 0}
 --- !u!95 &9500000
 Animator:
   serializedVersion: 5
@@ -241,28 +238,6 @@ MonoBehaviour:
     i15: 0
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
---- !u!114 &1198139924832023944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3931918477765718896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1790887305, guid: 951ce57ad999ac1f040a4dceb5f8b763, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 0
-  crit: 0
-  force: 0
-  damageColorIndex: 0
-  damageType:
-    damageType: 0
-    damageTypeExtended: 0
-    damageSource: 0
-  useDotMaxStacksFromAttacker: 0
-  dotMaxStacksFromAttacker: 4294967295
 --- !u!136 &4318101263965832616
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -274,9 +249,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.8
-  m_Height: 3
+  m_Height: 1
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0.5}
+  m_Center: {x: 0, y: 0, z: 0.8}
 --- !u!120 &-4498418834231623061
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -431,32 +406,6 @@ MonoBehaviour:
   localCollisionHappened: 0
   procCoefficient: 1
   CheckChildrenForCollidersAndIncludeDisabled: 0
---- !u!114 &8986658253201828638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3931918477765718896}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -899414464, guid: 951ce57ad999ac1f040a4dceb5f8b763, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damageCoefficient: 0
-  impactEffect: {fileID: 0}
-  forceVector: {x: 0, y: 0, z: 0}
-  overlapProcCoefficient: 1
-  maximumOverlapTargets: 2000000
-  onServerHit:
-    m_PersistentCalls:
-      m_Calls: []
-  fireFrequency: 60
-  resetInterval: -1
-  requireDelayOnePhysicsFrame: 0
-  ScaleWithVelocity: 0
-  ScaleVelocitySource: {fileID: 0}
-  ScaleWithVelocityAxis: {x: 0, y: 0, z: 1}
 --- !u!114 &2136942011095693304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,41 +445,6 @@ MonoBehaviour:
   stickEvent:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8966919121035823668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3931918477765718896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1845404088, guid: 951ce57ad999ac1f040a4dceb5f8b763, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shape: 0
-  radius: 18
-  interval: 1.25
-  rangeIndicator: {fileID: 8875573876603233852}
-  buffDef: {fileID: 0}
-  buffDuration: 2
-  floorWard: 1
-  expires: 0
-  invertTeamFilter: 0
-  expireDuration: 0
-  animateRadius: 0
-  radiusCoefficientCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  removalTime: 0
-  removalSoundString: 
-  onRemoval:
-    m_PersistentCalls:
-      m_Calls: []
-  requireGrounded: 0
 --- !u!1 &4771562663081744636
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,7 +456,6 @@ GameObject:
   - component: {fileID: 4403734822202101431}
   - component: {fileID: 1426582941613421839}
   - component: {fileID: 1561676050627056786}
-  - component: {fileID: 8723271768013409495}
   m_Layer: 14
   m_Name: SirTheresBeenASecondBuffWard
   m_TagString: Untagged
@@ -563,7 +476,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1403925749102536259}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1426582941613421839
 MonoBehaviour:
@@ -611,41 +524,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultTeam: 1
---- !u!114 &8723271768013409495
-MonoBehaviour:
+--- !u!1 &6147212407354811784
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4771562663081744636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1845404088, guid: 951ce57ad999ac1f040a4dceb5f8b763, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shape: 0
-  radius: 18
-  interval: 1.25
-  rangeIndicator: {fileID: 0}
-  buffDef: {fileID: 0}
-  buffDuration: 2
-  floorWard: 1
-  expires: 0
-  invertTeamFilter: 1
-  expireDuration: 0
-  animateRadius: 0
-  radiusCoefficientCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  removalTime: 0
-  removalSoundString: 
-  onRemoval:
-    m_PersistentCalls:
-      m_Calls: []
-  requireGrounded: 0
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3301171250300925908}
+  m_Layer: 0
+  m_Name: Indicator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3301171250300925908
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6147212407354811784}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8875573876603233852}
+  m_Father: {fileID: 1403925749102536259}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7402593987420911902
 GameObject:
   m_ObjectHideFlags: 0

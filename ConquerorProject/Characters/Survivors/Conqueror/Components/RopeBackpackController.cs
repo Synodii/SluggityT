@@ -9,7 +9,6 @@ using UnityEngine.Events;
 using ConquerorMod.Survivors.Conqueror.Components;
 using ConquerorMod.Survivors.Conqueror.SkillStates;
 
-
 namespace ConquerorMod.Survivors.Conqueror.Components
 {
     public class RopeBackpackController : MonoBehaviour
@@ -28,7 +27,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
         bool isFlying = false;
         float distanceToOwner;
-        float autoTriggerDistance = 25;
+        float autoTriggerDistance = ConquerorStaticValues.autoRecallDistance;
         float homeToBodyDistance = 50;
         float homingForce = 5f;
         float homingDeceleration = 0.33f;
@@ -37,19 +36,57 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         float timeFlying = 0;
         float minTimeBeforeReturning = 0.25f;
         float maxFlyTime = 2;
+        private bool isWaitingToRecall;
 
         void Awake()
         {
         }
 
-        void Start()
+        /*void Start()
         {
             ownerTransform = controller.owner.transform;
             objTracker = ownerTransform.GetComponent<ConquerorController>();
             objTracker.deployedBackpack.Add(this);
-            backpackCollider.enabled = true;
-            projectileDamage.force = 0;
             stickComponent.stickEvent.AddListener(OnStickEvent);
+
+            TeamFilter tf = GetComponent<TeamFilter>();
+            if (tf && controller.teamFilter)
+            {
+                tf.teamIndex = controller.teamFilter.teamIndex;
+                Debug.Log($"TeamFilter set to: {tf.teamIndex}");
+            }
+
+            if (buffward)
+            {
+                buffward.teamFilter = tf;
+                Debug.Log($"BuffWard team set to: {buffward.teamFilter?.teamIndex}");
+            }
+
+            // If you have a child buffward, repeat the assignment there
+            foreach (BuffWard childBuffWard in GetComponentsInChildren<BuffWard>())
+            {
+                if (childBuffWard != buffward)
+                {
+                    childBuffWard.teamFilter = tf;
+                }
+            }
+
+            Debug.Log($"BuffWard initialized. Buff: {buffward?.buffDef}, Radius: {buffward?.radius}, TeamIndex: {buffward.teamFilter?.teamIndex}");
+
+        }*/
+        void Start()
+        {
+            ownerTransform = controller.owner?.transform;
+            objTracker = ownerTransform?.GetComponent<ConquerorController>();
+
+            if (objTracker != null)
+            {
+                objTracker.deployedBackpack.Add(this);
+            }
+
+            stickComponent.stickEvent.AddListener(OnStickEvent);
+
+            // Try to get the TeamFilter
         }
         void OnStickEvent()
         {
@@ -79,24 +116,21 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             if (!isFlying && distanceToOwner > autoTriggerDistance)
             {
                 objTracker.isManualRecall = false;
-                StartCoroutine(FlyBack());
+                StartCoroutine(DelayedFlyBack());
             }
             if (isFlying)
             {
                 timeFlying += Time.fixedDeltaTime;
-                // if hook is near player or has been flying for a long time, engange homing to force the hook to quickly return
                 if ((distanceToOwner <= homeToBodyDistance && timeFlying >= minTimeBeforeReturning) || timeFlying >= maxFlyTime)
                 {
                     Vector3 vel = (ownerTransform.position - transform.position).normalized * rb.mass * Mathf.Max(homingForce - distanceToOwner, 1) * timeFlying;
                     rb.AddForce(vel, ForceMode.VelocityChange);
-                    //rb.MovePosition(Vector3.Lerp(rb.position, objTracker.fishingPoleTip.position, homingForce * distanceToOwner));
                     if (rb.velocity.magnitude > 1)
                     {
                         rb.velocity *= homingDeceleration;
                     }
                     else
                     {
-                        //TODO refund stock if nothing grabbed.
                         projSimple.lifetime = 0.0001f;
                     }
                 }
@@ -110,6 +144,20 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                 }
             }
         }
+        private IEnumerator DelayedFlyBack()
+        {
+            isWaitingToRecall = true;
+            yield return new WaitForSeconds(.5f);
+
+            distanceToOwner = Vector3.Distance(transform.position, ownerTransform.position);
+            if (!isFlying && distanceToOwner > autoTriggerDistance)
+            {
+                StartCoroutine(FlyBack());
+            }
+
+            isWaitingToRecall = false;
+        }
+
         public IEnumerator FlyBack()
         {
             Log.Debug("[BP] Flyback Start");
@@ -139,11 +187,6 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             Vector3 vel = (ownerTransform.position - transform.position).normalized * rb.mass;
             rb.AddForce(vel, ForceMode.VelocityChange);
 
-
-            // Enable Hitboxes
-            projOverlap.enabled = true;
-            projectileDamage.damage = objTracker.characterBody.damage * ConquerorStaticValues.ropeduffelretrieveDamageCoefficient;
-            projOverlap.damageCoefficient = 1;
 
             float startWidth = lineRenderer.startWidth;
             float endWidth = lineRenderer.endWidth;

@@ -1,9 +1,7 @@
 ﻿using RoR2;
 using UnityEngine;
 using ConquerorMod.Modules;
-using System;
 using RoR2.Projectile;
-using R2API;
 using ConquerorMod.Survivors.Conqueror.Components;
 
 namespace ConquerorMod.Survivors.Conqueror
@@ -81,6 +79,7 @@ namespace ConquerorMod.Survivors.Conqueror
             ropeBackpackProjectilePrefab.layer = LayerIndex.projectile.intVal;
 
             Transform thatbuffwardihate = ropeBackpackProjectilePrefab.transform.Find("SirTheresBeenASecondBuffWard");
+            Transform rangeindicator = ropeBackpackProjectilePrefab.transform.Find("Indicator");
 
             LineRenderer lineyboy = ropeBackpackProjectilePrefab.GetComponent<LineRenderer>();
             Rigidbody rb = ropeBackpackProjectilePrefab.GetComponent<Rigidbody>();
@@ -88,32 +87,42 @@ namespace ConquerorMod.Survivors.Conqueror
             ProjectileStickOnImpact stickOnImpact = ropeBackpackProjectilePrefab.GetComponent<ProjectileStickOnImpact>();
             ProjectileController pc = ropeBackpackProjectilePrefab.GetComponent<ProjectileController>();
             CapsuleCollider collider = ropeBackpackProjectilePrefab.GetComponent<CapsuleCollider>();
-            ProjectileOverlapAttack piss = ropeBackpackProjectilePrefab.GetComponent<ProjectileOverlapAttack>();
-            BuffWard bW1 = ropeBackpackProjectilePrefab.GetComponent<BuffWard>();
-            BuffWard bW2 = thatbuffwardihate.GetComponent<BuffWard>();
+            BuffWard bW1 = ropeBackpackProjectilePrefab.AddComponent<BuffWard>();
+            BuffWard bW2 = thatbuffwardihate.gameObject.AddComponent<BuffWard>();
 
+            Log.Debug($"[Debug] frenzyBuff is null? {ConquerorBuffs.frenzyBuff == null}");
+
+            bW1.shape = BuffWard.BuffWardShape.Sphere;
+            bW1.radius = ConquerorStaticValues.autoRecallDistance;
+            bW1.interval = 1f;
             bW1.buffDef = ConquerorBuffs.frenzyBuff;
-            bW2.buffDef = ConquerorBuffs.intimidateDebuff;
+            bW1.buffDuration = 1.5f;
+            bW1.rangeIndicator = rangeindicator;
+            bW1.floorWard = true;
+            bW1.expires = false;
+            bW1.invertTeamFilter = false;
+            bW1.animateRadius = false;
 
-            DamageTypeCombo ropeBagDmg = new DamageTypeCombo
-            {
-                damageType = DamageType.Stun1s,
-                damageTypeExtended = DamageTypeExtended.Generic,
-                damageSource = DamageSource.Secondary,
-            };
-            ProjectileDamage projectileDamage = ps.GetComponent<ProjectileDamage>();
-            projectileDamage.damageType = ropeBagDmg;
+            bW2.shape = BuffWard.BuffWardShape.Sphere;
+            bW2.radius = ConquerorStaticValues.autoRecallDistance;
+            bW2.interval = 1f;
+            bW2.buffDef = ConquerorBuffs.intimidateDebuff;
+            bW2.buffDuration = 1.5f;
+            bW2.rangeIndicator = null;
+            bW2.floorWard = true;
+            bW2.expires = false;
+            bW2.invertTeamFilter = true;
+            bW2.animateRadius = false;
 
             RopeBackpackController ropePack = ropeBackpackProjectilePrefab.AddComponent<RopeBackpackController>();
             ropePack.rb = rb;
             ropePack.stickComponent = stickOnImpact;
             ropePack.controller = pc;
             ropePack.backpackCollider = collider;
-            ropePack.projOverlap = piss;
             ropePack.projSimple = ps;
             ropePack.lineRenderer = lineyboy;
-
-            Log.Debug("Successfully performed CreateRopeBackpackProjectile");
+            ropePack.buffward = bW1;
+            //thatbuffwardihate.gameObject.buffward = bW2;
         }
         #endregion projectiles
     }

@@ -32,7 +32,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         private BlastAttack pullblast;
         private float pullblastDamageCoefficient = 0f;
         private float bleedblastDamageCoefficient = ConquerorStaticValues.warpDamageCoefficient;
-        private float chargedbleedblastDamageCoefficient = ConquerorStaticValues.chargedwarpDamageCoefficient;
+        //private float chargedbleedblastDamageCoefficient = ConquerorStaticValues.chargedwarpDamageCoefficient;
         private ChildLocator childLocator;
         private Vector3 forwardDirection;
         private Animator animator;
@@ -95,7 +95,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         private void CreateBlinkEffect(Vector3 origin)
         {
             EffectData effectData = new EffectData();
-            effectData.rotation = Util.QuaternionSafeLookRotation(this.aimSphere.transform.position - base.characterBody.corePosition);
+            effectData.rotation = Util.QuaternionSafeLookRotation(base.characterBody.corePosition - this.aimSphere.transform.position);
             effectData.origin = origin;
             EffectManager.SpawnEffect(EntityStates.ImpMonster.BlinkState.blinkPrefab, effectData, false);
         }
@@ -122,7 +122,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         private void ChargedSoundplayed()
         {
-            if (characterBody.GetComponent<ConquerorController>().bagDeployed == true)
+            if (!this.isCharged && characterBody.GetComponent<ConquerorController>().bagDeployed == true)
             {
                 this.isCharged = true;
                 Util.PlaySound("Play_voidDevastator_step", base.gameObject);
@@ -185,6 +185,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
             Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
 
+            this.CreateBlinkEffect(Util.GetCorePosition(base.gameObject));
+            this.CreateBlinkEffect(Util.GetCorePosition(this.aimSphere.gameObject));
 
             EntityState.Destroy(this.aimSphere.gameObject);
         }

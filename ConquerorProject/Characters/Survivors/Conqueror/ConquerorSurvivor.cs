@@ -44,10 +44,6 @@ namespace ConquerorMod.Survivors.Conqueror
         public static SkillDef specialRecallApportBackpack;
         public static SkillDef specialApportBackpack;
 
-        private string secondaryIconString;
-        private string secondaryDescString;
-
-
         public override BodyInfo bodyInfo => new BodyInfo
         {
             bodyName = bodyName,
@@ -120,8 +116,8 @@ namespace ConquerorMod.Survivors.Conqueror
             ConquerorStates.Init();
             ConquerorTokens.Init();
 
-            ConquerorAssets.Init(assetBundle);
             ConquerorBuffs.Init(assetBundle);
+            ConquerorAssets.Init(assetBundle);
 
             InitializeEntityStateMachines();
             InitializeSkills();
@@ -268,7 +264,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 skillNameToken = CONQUEROR_PREFIX + "SECONDARY_MUNCH_NAME",
                 skillDescriptionToken = CONQUEROR_PREFIX + "SECONDARY_MUNCH_DESCRIPTION",
                 //keywordTokens = new string[] { "KEYWORD_AGILE" },
-                skillIcon = assetBundle.LoadAsset<Sprite>(secondaryIconString),
+                skillIcon = assetBundle.LoadAsset<Sprite>("texSecondaryIcon"),
 
                 activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Eye)),
                 activationStateMachineName = "Weapon2",

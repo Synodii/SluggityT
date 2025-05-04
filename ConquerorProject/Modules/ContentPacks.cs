@@ -13,6 +13,9 @@ namespace ConquerorMod.Modules {
 
         public static List<GameObject> bodyPrefabs = new List<GameObject>();
         public static List<GameObject> masterPrefabs = new List<GameObject>();
+
+        public static List<BuffDef> buffDefs = new List<BuffDef>();
+
         public static List<GameObject> projectilePrefabs = new List<GameObject>();
 
         public static List<SurvivorDef> survivorDefs = new List<SurvivorDef>();
@@ -22,7 +25,6 @@ namespace ConquerorMod.Modules {
         public static List<SkillDef> skillDefs = new List<SkillDef>();
         public static List<Type> entityStates = new List<Type>();
 
-        public static List<BuffDef> buffDefs = new List<BuffDef>();
         public static List<EffectDef> effectDefs = new List<EffectDef>();
 
         public static List<NetworkSoundEventDef> networkSoundEventDefs = new List<NetworkSoundEventDef>();
@@ -43,6 +45,9 @@ namespace ConquerorMod.Modules {
 
             contentPack.bodyPrefabs.Add(bodyPrefabs.ToArray());
             contentPack.masterPrefabs.Add(masterPrefabs.ToArray());
+
+            contentPack.buffDefs.Add(buffDefs.ToArray());
+
             contentPack.projectilePrefabs.Add(projectilePrefabs.ToArray());
 
             contentPack.survivorDefs.Add(survivorDefs.ToArray());
@@ -52,7 +57,6 @@ namespace ConquerorMod.Modules {
             contentPack.skillFamilies.Add(skillFamilies.ToArray());
             contentPack.entityStateTypes.Add(entityStates.ToArray());
 
-            contentPack.buffDefs.Add(buffDefs.ToArray());
             contentPack.effectDefs.Add(effectDefs.ToArray());
 
             contentPack.networkSoundEventDefs.Add(networkSoundEventDefs.ToArray());
