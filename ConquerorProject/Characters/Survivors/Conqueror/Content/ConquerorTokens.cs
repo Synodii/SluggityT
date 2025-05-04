@@ -60,12 +60,12 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Utility
             Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
-            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> enemies. At full charge, incur a <style=cIsHealth>30% health cost</style>, <style=cIsUtility>cleanse debuffs</style>, and  <style=cIsHealth>teleport</style> enemies to you. Always charged when Special is active.");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> enemies. At full charge, incur a <style=cIsHealth>25% health cost</style>, <style=cIsUtility>cleanse debuffs</style>, and  <style=cIsHealth>teleport</style> enemies to you. Always charged when Special is active.");
             #endregion
 
             #region Special
             Language.Add(prefix + "SPECIAL_ROPEBACKPACK_NAME", "Conquest");
-            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_DESCRIPTION", $"Deploy your backpack. Allies near it are Frenzied, while enemies are Intimidated. Leave its radius or reactivate to reclaim it.");
+            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_DESCRIPTION", $"Deploy your backpack. Allies near it are Bolstered, while enemies are Disheartened. Leave its radius or reactivate to reclaim it.");
 
             Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_NAME", "Conquest");
             Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_DESCRIPTION", Tokens.stunningPrefix +  $"Recall your backpack.");

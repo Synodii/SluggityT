@@ -134,7 +134,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     Util.PlaySound("Play_voidDevastator_step", gameObject);
                     //Util.PlaySound("Play_ui_obj_eradicator_open", base.gameObject);
 
-                    characterBody.AddTimedBuff(ConquerorBuffs.frenzyBuff, 4f);
+                    characterBody.AddTimedBuff(ConquerorBuffs.satiatedBuff, 4f);
 
                     if (selfHealFraction > 0f)
                     {

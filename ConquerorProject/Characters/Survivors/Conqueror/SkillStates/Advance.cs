@@ -241,7 +241,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
                 EffectManager.SpawnEffect(LegacyResourcesAPI.Load<GameObject>("Prefabs/Effects/OmniExplosionVFX"), effectData, true);*/
 
-                float delay = UnityEngine.Random.Range(1f, 1.3f);
+                float delay = UnityEngine.Random.Range(.8f, 1f);
                 RoR2.Run.instance.StartCoroutine(TeleportEnemyAfterDelay(nmebody, targetPosition, delay));
                 //old pullforce code
                 /*if (nmebody.rigidbody)
@@ -267,7 +267,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
                 healthComponent.TakeDamage(new DamageInfo
                 {
-                    damage = healthComponent.combinedHealth * .3f,
+                    damage = healthComponent.combinedHealth * ConquerorStaticValues.chargeWarpHealthCost,
                     position = characterBody.corePosition,
                     attacker = null,
                     inflictor = null,
@@ -285,7 +285,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 nmebody.characterMotor.Motor.SetPosition(targetPosition);
                 nmebody.characterMotor.velocity = Vector3.zero;
                 nmebody.characterMotor.Motor.ForceUnground(0.1f);
-                SmallHop(nmebody.characterMotor, 5f);
+                SmallHop(nmebody.characterMotor, 3f);
             }
             else if (nmebody && nmebody.transform)
             {

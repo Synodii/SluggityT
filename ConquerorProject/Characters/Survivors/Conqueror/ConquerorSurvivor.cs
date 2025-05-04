@@ -514,21 +514,22 @@ namespace ConquerorMod.Survivors.Conqueror
         }
 
         
-        private int frenzybuffCount;
+        private int SatiatedbuffCount;
         private void RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, R2API.RecalculateStatsAPI.StatHookEventArgs args)
         {
-            frenzybuffCount = 0;
-
-            if (sender.HasBuff(ConquerorBuffs.frenzyBuff))
+            if (sender.HasBuff(ConquerorBuffs.satiatedBuff))
             {
-                frenzybuffCount = sender.GetBuffCount(ConquerorBuffs.frenzyBuff);
-                args.attackSpeedMultAdd += (0.30f * frenzybuffCount);
-                args.moveSpeedMultAdd += 0.25f * frenzybuffCount;
+                args.attackSpeedMultAdd += (0.30f * SatiatedbuffCount);
+                args.moveSpeedMultAdd += 0.25f * SatiatedbuffCount;
             }
-            if (sender.HasBuff(ConquerorBuffs.intimidateDebuff))
+            if (sender.HasBuff(ConquerorBuffs.disheartenedDebuff))
             {
                 args.armorAdd -= 30;
                 args.moveSpeedReductionMultAdd += .2f;
+            }
+            if (sender.HasBuff(ConquerorBuffs.bolsteredBuff))
+            {
+                args.armorAdd += 30;
             }
         }
     }

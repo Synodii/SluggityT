@@ -90,12 +90,10 @@ namespace ConquerorMod.Survivors.Conqueror
             BuffWard bW1 = ropeBackpackProjectilePrefab.AddComponent<BuffWard>();
             BuffWard bW2 = thatbuffwardihate.gameObject.AddComponent<BuffWard>();
 
-            Log.Debug($"[Debug] frenzyBuff is null? {ConquerorBuffs.frenzyBuff == null}");
-
             bW1.shape = BuffWard.BuffWardShape.Sphere;
             bW1.radius = ConquerorStaticValues.autoRecallDistance;
             bW1.interval = 1f;
-            bW1.buffDef = ConquerorBuffs.frenzyBuff;
+            bW1.buffDef = ConquerorBuffs.bolsteredBuff;
             bW1.buffDuration = 1.5f;
             bW1.rangeIndicator = rangeindicator;
             bW1.floorWard = true;
@@ -106,7 +104,7 @@ namespace ConquerorMod.Survivors.Conqueror
             bW2.shape = BuffWard.BuffWardShape.Sphere;
             bW2.radius = ConquerorStaticValues.autoRecallDistance;
             bW2.interval = 1f;
-            bW2.buffDef = ConquerorBuffs.intimidateDebuff;
+            bW2.buffDef = ConquerorBuffs.disheartenedDebuff;
             bW2.buffDuration = 1.5f;
             bW2.rangeIndicator = null;
             bW2.floorWard = true;
