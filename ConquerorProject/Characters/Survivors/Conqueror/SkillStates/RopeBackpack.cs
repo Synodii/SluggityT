@@ -62,6 +62,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             base.ModifyProjectileInfo(ref fireProjectileInfo);
             fireProjectileInfo.damageTypeOverride = DamageTypeCombo.GenericSpecial;
+            fireProjectileInfo.rotation = Quaternion.LookRotation(Vector3.down);
+            fireProjectileInfo.position = characterBody.corePosition + Vector3.up * 0.2f;
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()

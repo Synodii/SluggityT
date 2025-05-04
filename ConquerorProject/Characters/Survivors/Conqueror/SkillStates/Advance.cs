@@ -17,6 +17,7 @@ using static RoR2.BlastAttack;
 using System.Collections;
 using UnityEngine.UIElements;
 using ConquerorMod.Survivors.Conqueror.Components;
+//using ConquerorMod.Characters.Survivors.Conqueror.Content;
 
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
@@ -203,7 +204,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             pullblast.canRejectForce = false;
             pullblast.falloffModel = BlastAttack.FalloffModel.None;
             pullblast.baseDamage = 1f;
-            pullblast.damageType = DamageType.Stun1s;
+            pullblast.damageType = DamageType.Generic;
             pullblast.crit = RollCrit();
             pullblast.position = this.aimSphere.transform.position;
             BlastAttack.Result targetsHit = pullblast.Fire();

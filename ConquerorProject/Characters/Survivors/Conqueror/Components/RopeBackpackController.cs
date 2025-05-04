@@ -86,7 +86,12 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
             stickComponent.stickEvent.AddListener(OnStickEvent);
 
-            // Try to get the TeamFilter
+            if (rb)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.AddForce(Vector3.up * 5f, ForceMode.VelocityChange);
+            }
         }
         void OnStickEvent()
         {

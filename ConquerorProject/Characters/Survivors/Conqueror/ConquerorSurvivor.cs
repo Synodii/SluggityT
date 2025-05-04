@@ -94,6 +94,8 @@ namespace ConquerorMod.Survivors.Conqueror
         public override CharacterModel prefabCharacterModel { get; protected set; }
         public override GameObject displayPrefab { get; protected set; }
 
+        //public static BodyIndex conquerorBodyIndex;
+
         public override void Initialize()
         {
             //uncomment if you have multiple characters
@@ -101,6 +103,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             //if (!characterEnabled.Value)
             //    return;
+           // conquerorBodyIndex = BodyCatalog.FindBodyIndex("ConquerorBody"); // use internal name
 
             base.Initialize();
         }
@@ -116,7 +119,6 @@ namespace ConquerorMod.Survivors.Conqueror
             ConquerorStates.Init();
             ConquerorTokens.Init();
 
-            ConquerorBuffs.Init(assetBundle);
             ConquerorAssets.Init(assetBundle);
 
             InitializeEntityStateMachines();
@@ -508,6 +510,7 @@ namespace ConquerorMod.Survivors.Conqueror
         private void AddHooks()
         {
             R2API.RecalculateStatsAPI.GetStatCoefficients += RecalculateStatsAPI_GetStatCoefficients;
+
         }
 
         

@@ -1,4 +1,5 @@
 ﻿using EntityStates;
+using R2API;
 using RoR2;
 using RoR2.Audio;
 using RoR2.Skills;
@@ -20,6 +21,7 @@ namespace ConquerorMod.Modules.BaseStates
         protected string hitboxGroupName = "SwordGroup";
 
         protected DamageTypeCombo damageType = DamageType.Generic;
+        protected List<DamageAPI.ModdedDamageType> moddedDamageTypeHolder = new List<DamageAPI.ModdedDamageType>();
         protected float damageCoefficient = 3.5f;
         protected float procCoefficient = 1f;
         protected float pushForce = 300f;
@@ -86,6 +88,10 @@ namespace ConquerorMod.Modules.BaseStates
         protected virtual void PlayAttackAnimation()
         {
             PlayCrossfade("Gesture, Override", "Slash" + (1 + swingIndex), playbackRateParam, duration, 0.05f);
+            if (swingIndex == 2)
+            {
+                PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1f);
+            }
         }
 
         public override void OnExit()

@@ -52,7 +52,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Secondary
             Language.Add(prefix + "SECONDARY_MUNCH_NAME", "Imbibe");
-            Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>. <style=cIsUtility>Becomes Smother while Special is active.</style>");
+            Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>.  Refreshes 1 Utility stock. Hold up to 3. <style=cIsUtility>Becomes Smother while Special is active.</style>. REMOVE FROM THIS DESC AND MAKE ITS OWN BUT IM TOO LAZY: Crush an imp eye. exploding an area for <style=cIsDamage>{100f * ConquerorStaticValues.eyeblastinitDamageCoefficient}% damage</style>. After a delay, each enemy hit will explode again in a smaller radius for <style=cIsDamage>{100f * ConquerorStaticValues.eyeblastsecondaryblastDamageCoefficient}% damage</style>. Refreshes 1 Utility stock. Hold up to 3.");
 
             Language.Add(prefix + "SECONDARY_CRUSH_NAME", "Smother");
             Language.Add(prefix + "SECONDARY_CRUSH_DESCRIPTION", Tokens.agilePrefix + $"insert token here");
@@ -60,15 +60,15 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Utility
             Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
-            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, <style=cIsUtility>cleanse debuffs</style> and deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> and <style=cIsUtility>pulling</style> in enemies. At full charge, incur <style=cIsHealth>30% health</style>, <style=cIsUtility>refill a secondary stock,</style> and deal <style=cIsDamage>{100f}% damage</style> instead.");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> enemies. At full charge, incur a <style=cIsHealth>30% health cost</style>, <style=cIsUtility>cleanse debuffs</style>, and  <style=cIsHealth>teleport</style> enemies to you. Always charged when Special is active.");
             #endregion
 
             #region Special
             Language.Add(prefix + "SPECIAL_ROPEBACKPACK_NAME", "Conquest");
-            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_DESCRIPTION", $"Deploy your backpack. Allies near it are Frenzied, while enemies are Intimidated. Leave its radius or reactivate to reclaim it, dealing <style=cIsDamage>{100f * ConquerorStaticValues.ropeduffelretrieveDamageCoefficient}% damage</style> and <style=cIsUtility>Stunning</style> enemies in its path.");
+            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_DESCRIPTION", $"Deploy your backpack. Allies near it are Frenzied, while enemies are Intimidated. Leave its radius or reactivate to reclaim it.");
 
             Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_NAME", "Conquest");
-            Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_DESCRIPTION", Tokens.stunningPrefix +  $"Recall your backpack, dealing <style=cIsDamage>{100f * ConquerorStaticValues.ropeduffelretrieveDamageCoefficient}% damage</style> to any enemies it impacts.");
+            Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_DESCRIPTION", Tokens.stunningPrefix +  $"Recall your backpack.");
             #endregion
 
             #region Achievements

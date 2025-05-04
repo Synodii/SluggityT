@@ -1,4 +1,5 @@
-﻿using ConquerorMod.Modules.BaseStates;
+﻿//using ConquerorMod.Characters.Survivors.Conqueror.Content;
+using ConquerorMod.Modules.BaseStates;
 using EntityStates;
 using RoR2;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             pushForce = 300f;
             bonusForce = Vector3.zero;
             baseDuration = 1f;
+            //moddedDamageTypeHolder.Add(DamageTypes.MarkForScrounge);
 
             //0-1 multiplier of baseduration, used to time when the hitbox is out (usually based on the run time of the animation)
             //for example, if attackStartPercentTime is 0.5, the attack will start hitting halfway through the ability. if baseduration is 3 seconds, the attack will start happening at 1.5 seconds
@@ -43,6 +45,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             if (swingIndex == 2)
             {
                 attack.damageType = RoR2.DamageType.BonusToLowHealth;
+                //moddedDamageTypeHolder.Add(DamageTypes.MarkForScrounge);
                 //attack.damageType = RoR2.DamageType.BleedOnHit
             }
 
