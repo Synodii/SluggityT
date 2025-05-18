@@ -11,9 +11,11 @@ namespace ConquerorMod.Survivors.Conqueror
             get { return baseBackpackHitStop * hitStopMod; }
         }
 
-        public const float swingDamageCoefficient = 3f;
+        public const float swingDamageCoefficient = 3.5f;
 
-        public const float warpDamageCoefficient = 2.5f;
+        public const float thirdswingDamageCoefficient = 4f;
+
+        public const float warpeyeDamageCoefficient = 1.2f;
 
         //public const float chargedwarpDamageCoefficient = 5f;
 
@@ -28,7 +30,5 @@ namespace ConquerorMod.Survivors.Conqueror
         public const float apportduffelretrieveDamageCoefficient = 2f;
 
         public const float chargeWarpHealthCost = .25f;
-
-        public const float autoRecallDistance = 18;
     }
 }

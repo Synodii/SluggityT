@@ -5,9 +5,12 @@ using RoR2;
 using System.Collections.Generic;
 using System.Security;
 using System.Security.Permissions;
+using UnityEngine;
 
 [module: UnverifiableCode]
+#pragma warning disable CS0618 // Type or member is obsolete
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
+#pragma warning restore CS0618 // Type or member is obsolete
 
 //rename this namespace
 namespace ConquerorMod
@@ -45,5 +48,6 @@ namespace ConquerorMod
             // make a content pack and add it. this has to be last
             new Modules.ContentPacks().Initialize();
         }
+
     }
 }

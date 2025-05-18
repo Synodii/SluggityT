@@ -47,7 +47,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Primary
             Language.Add(prefix + "PRIMARY_AXE_NAME", "Overpower");
-            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", $"Swing forward for <style=cIsDamage>{100f * ConquerorStaticValues.swingDamageCoefficient}% damage</style>. Every 3rd hit has <style=cIsDamage>Slayer</style>.");
+            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", $"Swing forward for <style=cIsDamage>{100f * ConquerorStaticValues.swingDamageCoefficient}% damage</style>. Every 3rd hit does <style=cIsDamage>{100f * ConquerorStaticValues.thirdswingDamageCoefficient}% damage</style> and is <style=cIsDamage>Slayer</style>.");
             #endregion
 
             #region Secondary
@@ -60,7 +60,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Utility
             Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
-            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, deal <style=cIsDamage>{100f * ConquerorStaticValues.warpDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> enemies. At full charge, incur a <style=cIsHealth>25% health cost</style>, <style=cIsUtility>cleanse debuffs</style>, and  <style=cIsHealth>teleport</style> enemies to you. Always charged when Special is active.");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, deal <style=cIsDamage>{100f * ConquerorStaticValues.warpeyeDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> enemies. At full charge, incur a <style=cIsHealth>25% health cost</style>, <style=cIsUtility>cleanse debuffs</style>, and  <style=cIsHealth>teleport</style> enemies to you. Always charged when Special is active.");
             #endregion
 
             #region Special

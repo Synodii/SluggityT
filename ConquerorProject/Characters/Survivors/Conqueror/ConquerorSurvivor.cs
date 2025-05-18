@@ -6,6 +6,7 @@ using ConquerorMod.Survivors.Conqueror.SkillStates;
 using RoR2;
 using RoR2.Skills;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
         public static SkillDef specialRecallRopeBackpack;
         public static SkillDef specialRopeBackpack;
-       
+
         public static SkillDef specialRecallApportBackpack;
         public static SkillDef specialApportBackpack;
 
@@ -82,7 +83,7 @@ namespace ConquerorMod.Survivors.Conqueror
         };
 
         public override UnlockableDef characterUnlockableDef => ConquerorUnlockables.characterUnlockableDef;
-        
+
         public override ItemDisplaysBase itemDisplays => new ConquerorItemDisplays();
 
         //set in base classes
@@ -94,16 +95,20 @@ namespace ConquerorMod.Survivors.Conqueror
         public override CharacterModel prefabCharacterModel { get; protected set; }
         public override GameObject displayPrefab { get; protected set; }
 
-        //public static BodyIndex conquerorBodyIndex;
+        public static BodyIndex conquerorBodyIndex;
 
         public override void Initialize()
         {
-            //uncomment if you have multiple characters
-            //ConfigEntry<bool> characterEnabled = Config.CharacterEnableConfig("Survivors", "Conqueror");
+            ConfigEntry<bool> characterEnabled = Config.CharacterEnableConfig("Survivors", "Conqueror");
 
-            //if (!characterEnabled.Value)
-            //    return;
-           // conquerorBodyIndex = BodyCatalog.FindBodyIndex("ConquerorBody"); // use internal name
+            if (!characterEnabled.Value)
+                return;
+
+            BodyCatalog.availability.CallWhenAvailable(() =>
+            {
+                conquerorBodyIndex = BodyCatalog.FindBodyIndex("ConquerorBody"); // use internal name
+                Log.Debug($"[Conqueror] Registered body index: {conquerorBodyIndex}");
+            });
 
             base.Initialize();
         }
@@ -127,8 +132,18 @@ namespace ConquerorMod.Survivors.Conqueror
             InitializeCharacterMaster();
 
             AdditionalBodySetup();
-
             AddHooks();
+        }
+
+        private IEnumerator AssignBodyIndexWhenReady()
+        {
+            while (BodyCatalog.FindBodyIndex("ConquerorBody") == BodyIndex.None)
+            {
+                yield return null;
+            }
+
+            conquerorBodyIndex = BodyCatalog.FindBodyIndex("ConquerorBody");
+            Log.Debug($"[Conqueror] BodyIndex assigned: {conquerorBodyIndex}");
         }
 
         private void AdditionalBodySetup()
@@ -150,7 +165,7 @@ namespace ConquerorMod.Survivors.Conqueror
             Prefabs.SetupHitBoxGroup(characterModelObject, "SwordGroup", swordHitBoxTransform);
         }
 
-        public override void InitializeEntityStateMachines() 
+        public override void InitializeEntityStateMachines()
         {
             //clear existing state machines from your cloned body (probably commando)
             //omit all this if you want to just keep theirs
@@ -159,7 +174,7 @@ namespace ConquerorMod.Survivors.Conqueror
             //the main "Body" state machine has some special properties
             Prefabs.AddMainEntityStateMachine(bodyPrefab, "Body", typeof(EntityStates.GenericCharacterMain), typeof(EntityStates.SpawnTeleporterState));
             //if you set up a custom main characterstate, set it up here
-                //don't forget to register custom entitystates in your ConquerorStates.cs
+            //don't forget to register custom entitystates in your ConquerorStates.cs
 
             Prefabs.AddEntityStateMachine(bodyPrefab, "Weapon");
             Prefabs.AddEntityStateMachine(bodyPrefab, "Weapon2");
@@ -270,9 +285,9 @@ namespace ConquerorMod.Survivors.Conqueror
 
                 activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Eye)),
                 activationStateMachineName = "Weapon2",
-                interruptPriority = EntityStates.InterruptPriority.Skill,
+                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
 
-                baseRechargeInterval = 16f,
+                baseRechargeInterval = 9f,
                 baseMaxStock = 3,
 
                 rechargeStock = 1,
@@ -282,8 +297,8 @@ namespace ConquerorMod.Survivors.Conqueror
                 resetCooldownTimerOnUse = false,
                 fullRestockOnAssign = false,
                 dontAllowPastMaxStocks = false,
-                mustKeyPress = false,
-                beginSkillCooldownOnSkillEnd = false,
+                mustKeyPress = true,
+                beginSkillCooldownOnSkillEnd = true,
 
                 isCombatSkill = false,
                 canceledFromSprinting = false,
@@ -351,7 +366,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 stockToConsume = 1,
 
                 resetCooldownTimerOnUse = false,
-                fullRestockOnAssign = true,
+                fullRestockOnAssign = false,
                 dontAllowPastMaxStocks = false,
                 mustKeyPress = false,
                 beginSkillCooldownOnSkillEnd = true,
@@ -360,7 +375,7 @@ namespace ConquerorMod.Survivors.Conqueror
                 canceledFromSprinting = false,
                 cancelSprintingOnActivation = true,
                 forceSprintDuringState = false,
-            });;
+            }); ;
             Skills.AddUtilitySkills(bodyPrefab, utilityWarp);
         }
 
@@ -376,15 +391,16 @@ namespace ConquerorMod.Survivors.Conqueror
                 skillDescriptionToken = CONQUEROR_PREFIX + "SPECIAL_ROPEBACKPACK_DESCRIPTION",
                 skillIcon = assetBundle.LoadAsset<Sprite>("texSpecialIcon"),
 
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.RopeBackpack)),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.RopeBackpackCharge)),
                 //setting this to the "weapon2" EntityStateMachine allows us to cast this skill at the same time primary, which is set to the "weapon" EntityStateMachine
-                activationStateMachineName = "Weapon2", interruptPriority = EntityStates.InterruptPriority.Skill,
+                activationStateMachineName = "Weapon2",
+                interruptPriority = EntityStates.InterruptPriority.Skill,
 
                 baseMaxStock = 1,
                 baseRechargeInterval = 6f,
 
                 isCombatSkill = false,
-                mustKeyPress = false,
+                mustKeyPress = true,
                 cancelSprintingOnActivation = true,
             });
 
@@ -438,9 +454,9 @@ namespace ConquerorMod.Survivors.Conqueror
                 prefabCharacterModel.gameObject);
 
             //these are your Mesh Replacements. The order here is based on your CustomRendererInfos from earlier
-                //pass in meshes as they are named in your assetbundle
+            //pass in meshes as they are named in your assetbundle
             //currently not needed as with only 1 skin they will simply take the default meshes
-                //uncomment this when you have another skin
+            //uncomment this when you have another skin
             //defaultSkin.meshReplacements = Modules.Skins.getMeshReplacements(assetBundle, defaultRendererinfos,
             //    "meshConquerorSword",
             //    "meshConquerorGun",
@@ -452,7 +468,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             //uncomment this when you have a mastery skin
             #region MasterySkin
-            
+
             ////creating a new skindef as we did before
             //SkinDef masterySkin = Modules.Skins.CreateSkinDef(HENRY_PREFIX + "MASTERY_SKIN_NAME",
             //    assetBundle.LoadAsset<Sprite>("texMasteryAchievement"),
@@ -485,7 +501,7 @@ namespace ConquerorMod.Survivors.Conqueror
             ////simply find an object on your child locator you want to activate/deactivate and set if you want to activate/deacitvate it with this skin
 
             //skins.Add(masterySkin);
-            
+
             #endregion
 
             skinController.skins = skins.ToArray();
@@ -510,23 +526,71 @@ namespace ConquerorMod.Survivors.Conqueror
         private void AddHooks()
         {
             R2API.RecalculateStatsAPI.GetStatCoefficients += RecalculateStatsAPI_GetStatCoefficients;
-
+            On.RoR2.HealthComponent.TakeDamage += ConqDamageReduction;
         }
+        private void ConqDamageReduction(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
+        {
+            if (!self || !self.body)
+            {
+                orig(self, damageInfo);
+                return;
+            }
 
-        
-        private int SatiatedbuffCount;
+            if (self.body.bodyIndex == conquerorBodyIndex)
+            {
+                float scalingFactor = .3f;
+
+                float currentHP = self.health;
+                float maxHP = self.fullCombinedHealth;
+                float incomingDamage = damageInfo.damage;
+
+                float predictedHP = Mathf.Max(0f, currentHP - incomingDamage);
+                float missingHpFraction = 1f - (predictedHP / maxHP);
+
+                float conqDamReduct = Mathf.Pow(missingHpFraction, 2f) * (1f * scalingFactor);
+                float maxReduction = 0.8f; // safety cap
+                conqDamReduct = Mathf.Min(conqDamReduct, maxReduction);
+
+                float originalDamage = damageInfo.damage;
+                damageInfo.damage *= 1f - conqDamReduct;
+
+
+                if (self.body.master == LocalUserManager.GetFirstLocalUser().currentNetworkUser.master)
+                {
+                    Chat.AddMessage($"<color=#FFA500>[Conqueror]</color> Original Damage: {originalDamage}, DR: {conqDamReduct * 100f:F1}%, Final: {damageInfo.damage} Predicted HP: {predictedHP}, Missing: {missingHpFraction * 100f:F1}%");
+                }
+            }
+
+            orig(self, damageInfo);
+        }
+    
+
         private void RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, R2API.RecalculateStatsAPI.StatHookEventArgs args)
         {
-            if (sender.HasBuff(ConquerorBuffs.satiatedBuff))
+            /* HEALTH PASSIVE OLD
+            if (sender)
             {
-                args.attackSpeedMultAdd += (0.30f * SatiatedbuffCount);
-                args.moveSpeedMultAdd += 0.25f * SatiatedbuffCount;
-            }
-            if (sender.HasBuff(ConquerorBuffs.disheartenedDebuff))
-            {
-                args.armorAdd -= 30;
-                args.moveSpeedReductionMultAdd += .2f;
-            }
+                Log.Debug($"Conqueror BodyIndex = {conquerorBodyIndex};");
+                //if (sender.bodyIndex == conquerorBodyIndex)
+                //{
+                    if (sender.healthComponent != null)
+                    {
+                        float currentFraction = sender.healthComponent.combinedHealthFraction;
+
+                        if (!float.IsFinite(currentFraction) || currentFraction < 0f || currentFraction > 1f)
+                        {
+                            Log.Warning($"[Conqueror] Invalid health fraction: {currentFraction}");
+                            return;
+                        }
+
+                        float missingFraction = 1f - currentFraction;
+                        Log.Debug($"[Conqueror] Missing HP Fraction: {missingFraction}");
+
+                        args.healthMultAdd += missingFraction;
+                    }
+                //}
+            }*/
+
             if (sender.HasBuff(ConquerorBuffs.bolsteredBuff))
             {
                 args.armorAdd += 30;

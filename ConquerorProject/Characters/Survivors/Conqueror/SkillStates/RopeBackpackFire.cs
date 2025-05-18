@@ -9,23 +9,12 @@ using ConquerorMod.Survivors.Conqueror.Components;
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
-    public class RopeBackpack : GenericProjectileBaseState
+    public class RopeBackpackFire : GenericProjectileBaseState
     {
+        public float charge;
         public override void OnEnter()
         {
             projectilePrefab = ConquerorAssets.ropeBackpackProjectilePrefab;
-            if (projectilePrefab != null)
-            {
-                Log.Debug($"[Test] Firing projectile: {projectilePrefab.name}");
-                if (!projectilePrefab.GetComponent<RopeBackpackController>())
-                {
-                    Log.Debug("[Test] RopeBackpackController is NOT on the prefab!");
-                }
-                else
-                {
-                    Log.Debug("[Test] RopeBackpackController is present on the prefab.");
-                }
-            }
 
             baseDuration = 0.4f;
             force = 0f;
@@ -52,18 +41,27 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         }
 
 
-
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-        }
-
         public override void ModifyProjectileInfo(ref FireProjectileInfo fireProjectileInfo)
         {
             base.ModifyProjectileInfo(ref fireProjectileInfo);
+
+            float clampedCharge = Mathf.Clamp01(charge);
+            float minSpeed = 4f;
+            float maxSpeed = 60f;
+
+
+            //Ray aimRay;
+
+
+            Vector3 aimDirection = GetAimRay().direction;
+            Vector3 spawnPos = characterBody.corePosition + aimDirection * 1.5f;
+
+            fireProjectileInfo.position = spawnPos;
+            fireProjectileInfo.rotation = Quaternion.LookRotation(aimDirection);
+            fireProjectileInfo.speedOverride = Mathf.Lerp(minSpeed, maxSpeed, clampedCharge);
             fireProjectileInfo.damageTypeOverride = DamageTypeCombo.GenericSpecial;
-            fireProjectileInfo.rotation = Quaternion.LookRotation(Vector3.down);
-            fireProjectileInfo.position = characterBody.corePosition + Vector3.up * 0.2f;
+
+            Log.Debug($"SpawnPos CharBody.coreposition + that fucking thing= = {spawnPos}");
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()

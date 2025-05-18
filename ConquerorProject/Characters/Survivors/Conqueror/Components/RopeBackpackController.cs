@@ -20,14 +20,13 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public CapsuleCollider backpackCollider;
         public ProjectileOverlapAttack projOverlap;
         public ProjectileSimple projSimple;
-        public LineRenderer lineRenderer;
         public BuffWard buffward;
-
         ConquerorController objTracker;
 
         bool isFlying = false;
-        float distanceToOwner;
-        float autoTriggerDistance = ConquerorStaticValues.autoRecallDistance;
+        //float distanceToOwner; 
+        float autoTriggerDistance = 75;
+        float autoDropDistance = 65;
         float homeToBodyDistance = 50;
         float homingForce = 5f;
         float homingDeceleration = 0.33f;
@@ -35,68 +34,47 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         Transform ownerTransform;
         float timeFlying = 0;
         float minTimeBeforeReturning = 0.25f;
-        float maxFlyTime = 2;
+        float maxFlyTime = 1.5f;
+
         private bool isWaitingToRecall;
+        bool hasStuck = false;
+        public Vector3 backpackTargetPos; // where the rope landed
+        public Vector3 playerPos;
+
+        private Vector3 projectilespawnPosition;
 
         void Awake()
         {
+            Log.Debug($"AWAKE position: {transform.position}");
+            Log.Debug($"Awake Rigidbody position: {rb.position}, velocity: {rb.velocity}, isKinematic: {rb.isKinematic}");
         }
 
-        /*void Start()
-        {
-            ownerTransform = controller.owner.transform;
-            objTracker = ownerTransform.GetComponent<ConquerorController>();
-            objTracker.deployedBackpack.Add(this);
-            stickComponent.stickEvent.AddListener(OnStickEvent);
-
-            TeamFilter tf = GetComponent<TeamFilter>();
-            if (tf && controller.teamFilter)
-            {
-                tf.teamIndex = controller.teamFilter.teamIndex;
-                Debug.Log($"TeamFilter set to: {tf.teamIndex}");
-            }
-
-            if (buffward)
-            {
-                buffward.teamFilter = tf;
-                Debug.Log($"BuffWard team set to: {buffward.teamFilter?.teamIndex}");
-            }
-
-            // If you have a child buffward, repeat the assignment there
-            foreach (BuffWard childBuffWard in GetComponentsInChildren<BuffWard>())
-            {
-                if (childBuffWard != buffward)
-                {
-                    childBuffWard.teamFilter = tf;
-                }
-            }
-
-            Debug.Log($"BuffWard initialized. Buff: {buffward?.buffDef}, Radius: {buffward?.radius}, TeamIndex: {buffward.teamFilter?.teamIndex}");
-
-        }*/
         void Start()
         {
-            ownerTransform = controller.owner?.transform;
-            objTracker = ownerTransform?.GetComponent<ConquerorController>();
+            Log.Debug($"START position: {transform.position}");
+            Log.Debug($"START Rigidbody position: {rb.position}, velocity: {rb.velocity}, isKinematic: {rb.isKinematic}");
+
+            rb.isKinematic = false;
+            rb.useGravity = true;
+
+            rb.position = projectilespawnPosition;
+            ownerTransform = controller.owner.transform;
+            objTracker = ownerTransform.GetComponent<ConquerorController>();
+
 
             if (objTracker != null)
             {
                 objTracker.deployedBackpack.Add(this);
             }
-
+            backpackCollider.enabled = true;
             stickComponent.stickEvent.AddListener(OnStickEvent);
-
-            if (rb)
-            {
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-                rb.AddForce(Vector3.up * 5f, ForceMode.VelocityChange);
-            }
         }
         void OnStickEvent()
         {
             if (isFlying) return;
-            //Log.Debug($"[HOOK] STICK EVENT");
+
+            Log.Debug("[RopeBackpack] STUCK POSITION: " + transform.position);
+            
 
             //remove motion and collision in order to prevent enemy sliding
             backpackCollider.enabled = false;
@@ -116,19 +94,37 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
         void FixedUpdate()
         {
+            playerPos = objTracker.characterBody.footPosition;
+
             if (controller.owner == null) Destroy(gameObject);
-            distanceToOwner = Vector3.Distance(transform.position, ownerTransform.position);
-            if (!isFlying && distanceToOwner > autoTriggerDistance)
+
+            objTracker.distanceToOwner = Vector3.Distance(transform.position, ownerTransform.position);
+            if (!isFlying)
             {
-                objTracker.isManualRecall = false;
-                StartCoroutine(DelayedFlyBack());
+                if (objTracker.distanceToOwner > autoTriggerDistance)
+                {
+                    objTracker.isManualRecall = false;
+                    StartCoroutine(DelayedFlyBack());
+                }
+                else if (objTracker.distanceToOwner > autoDropDistance)
+                {
+                    rb.useGravity = true;
+                    rb.isKinematic = false;
+                    rb.velocity = Vector3.down * 30f;
+                    rb.angularVelocity = Vector3.zero;
+
+                    if (projSimple)
+                    {
+                        projSimple.desiredForwardSpeed = 0;
+                    }
+                }
             }
             if (isFlying)
             {
                 timeFlying += Time.fixedDeltaTime;
-                if ((distanceToOwner <= homeToBodyDistance && timeFlying >= minTimeBeforeReturning) || timeFlying >= maxFlyTime)
+                if ((objTracker.distanceToOwner <= homeToBodyDistance && timeFlying >= minTimeBeforeReturning) || timeFlying >= maxFlyTime)
                 {
-                    Vector3 vel = (ownerTransform.position - transform.position).normalized * rb.mass * Mathf.Max(homingForce - distanceToOwner, 1) * timeFlying;
+                    Vector3 vel = (ownerTransform.position - transform.position).normalized * rb.mass * Mathf.Max(homingForce - objTracker.distanceToOwner, 1) * timeFlying;
                     rb.AddForce(vel, ForceMode.VelocityChange);
                     if (rb.velocity.magnitude > 1)
                     {
@@ -139,7 +135,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                         projSimple.lifetime = 0.0001f;
                     }
                 }
-                if (distanceToOwner <= 3)
+                if (objTracker.distanceToOwner <= 3)
                 {
                     projSimple.lifetime = 0.0001f;
                     if (!objTracker.isManualRecall)
@@ -149,13 +145,34 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                 }
             }
         }
+
+
+        private Vector3 GetPullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)
+        {
+            Vector3 toTarget = targetPos - startPos;
+            Vector2 xz = new Vector2(toTarget.x, toTarget.z);
+            float distanceXZ = xz.magnitude;
+
+            //distanceXZ * x, y, z
+            float timeToTarget = Mathf.Clamp(distanceXZ * 1f, 1.2f, 1f);
+
+            float ySpeed = isFlyer
+                ? toTarget.y / timeToTarget
+                : Mathf.Max(Trajectory.CalculateInitialYSpeed(timeToTarget, toTarget.y), 6f);
+
+            return new Vector3(
+                xz.x / timeToTarget,
+                ySpeed,
+                xz.y / timeToTarget
+            );
+        }
+
         private IEnumerator DelayedFlyBack()
         {
             isWaitingToRecall = true;
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(1f);
 
-            distanceToOwner = Vector3.Distance(transform.position, ownerTransform.position);
-            if (!isFlying && distanceToOwner > autoTriggerDistance)
+            if (!isFlying && objTracker.distanceToOwner > autoTriggerDistance)
             {
                 StartCoroutine(FlyBack());
             }
@@ -168,9 +185,22 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             Log.Debug("[BP] Flyback Start");
             Util.PlaySound("Play_scav_backpack_open", gameObject);
 
+            //fling
+            backpackTargetPos = transform.position;
+
+            if (objTracker.distanceToOwner > 18f && objTracker.characterBody && objTracker.characterMotor && objTracker.isManualRecall)
+            {
+                Vector3 pullVelocity = GetPullVelocity(backpackTargetPos, playerPos, false);
+
+                objTracker.characterMotor.velocity = pullVelocity;
+                objTracker.characterMotor.Motor.ForceUnground(0.1f);
+                Debug.DrawLine(playerPos, backpackTargetPos, Color.cyan, 2f);
+            }
+
+            transform.localScale = new Vector3(0F, 0F, 0F);
+
 
             isFlying = true; //aka is being recalled
-
 
             backpackCollider.enabled = true;
             backpackCollider.gameObject.layer = LayerIndex.noCollision.intVal;
@@ -192,7 +222,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             Vector3 vel = (ownerTransform.position - transform.position).normalized * rb.mass;
             rb.AddForce(vel, ForceMode.VelocityChange);
 
-
+            /*
             float startWidth = lineRenderer.startWidth;
             float endWidth = lineRenderer.endWidth;
 
@@ -204,15 +234,14 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             lineRenderer.startWidth = startWidth;
-            lineRenderer.endWidth = endWidth;
-
+            lineRenderer.endWidth = endWidth;*/
         }
 
-        bool inHitPause;
-        float hitStopDuration = 0.05f;
-        Vector3 storedVelocity;
-        HitStopCachedState hitStopCachedState;
-        float hitPauseTimer;
-        string playbackRateParam = "SecondaryCast.playbackRate";
+        //bool inHitPause;
+        //float hitStopDuration = 0.05f;
+        //Vector3 storedVelocity;
+        //HitStopCachedState hitStopCachedState;
+        //float hitPauseTimer;
+        //string playbackRateParam = "SecondaryCast.playbackRate";
     }
 }

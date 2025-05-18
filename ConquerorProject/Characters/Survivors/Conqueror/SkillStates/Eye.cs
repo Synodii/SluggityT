@@ -2,49 +2,118 @@
 using ConquerorMod.Survivors.Conqueror;
 using ConquerorMod.Modules.BaseStates;
 using RoR2;
+using System;
+using EntityStates.ImpMonster;
+using EntityStates.ImpBossMonster;
+using EntityStates.Huntress;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine.Networking;
 using UnityEngine;
 using R2API;
-using UnityEngine.Networking;
-using ConquerorMod.Survivors.Conqueror.Components;
+using RoR2.Skills;
+using static RoR2.BlastAttack;
 using System.Collections;
+using UnityEngine.UIElements;
+using ConquerorMod.Survivors.Conqueror.Components;
+using UnityEngine.AddressableAssets;
+using ConquerorMod.Modules;
+using System.Linq;
+using static RoR2.CameraTargetParams;
+using TMPro;
+using static UnityEngine.UI.Image;
+//using ConquerorMod.Characters.Survivors.Conqueror.Content;
 
 
 namespace ConquerorMod.Survivors.Conqueror.SkillStates
 {
     public class Eye : BaseSkillState
     {
-        public static float selfHealFraction = .15f;
-
-        public static float baseDuration = 1f;
-        //delay on firing is usually ass-feeling. only set this if you know what you're doing
-        // I KNOW WHAT IM DOING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        public static float baseDuration = .5f;
         public static float firePercentTime = 1f;
-
         private float duration;
         private float fireTime;
         private bool hasFired;
         private string muzzleString;
+
+
         private float baseMaxUtilityStock;
         private float utilityStock;
 
-        private BlastAttack secondaryeyeblast;
-        private BlastAttack eyeblastinit;
+        //nme teleport
+        private BlastAttack bleeddetector;
+        private float bleeddetectorDamageCoefficient = 0f;
+        private BlastAttack bleedburst;
+        private float bleedburstDamageCoefficient = 2f;
+
+        //self teleport
+        private Ray aimRay;
+        private float blinkDistance = 15f;
+        private float extendedRange = 30f;
+        private BlastAttack bleedblast;
+        private float bleedblastDamageCoefficient = ConquerorStaticValues.warpeyeDamageCoefficient;
+        private ChildLocator childLocator;
+        private Vector3 forwardDirection;
+        private Animator animator;
+        private Vector3 blinkVector = Vector3.zero;
+        private Vector3 initialPosition = Vector3.zero;
+
+        private Transform modelTransform;
+        private CharacterModel characterModel;
+        private HurtBoxGroup hurtboxGroup;
+
+
+        //vfx
+        private GameObject transmitterExplode = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC2/Items/TeleportOnLowHealth/TeleportOnLowHealthVFX.prefab").WaitForCompletion();
+        private GameObject shatterspleenExplode = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/BleedOnHitAndExplode/BleedOnHitAndExplode_Explosion.prefab").WaitForCompletion();
+        private GameObject voidspikeExplode = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ImpBoss/ImpVoidspikeExplosion.prefab").WaitForCompletion();
+        private GameObject shatterspleenImpact = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/BleedOnHitAndExplode/BleedOnHitAndExplode_Impact.prefab").WaitForCompletion();
+        private GameObject impbossBlink = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ImpBoss/ImpBossBlink.prefab").WaitForCompletion();
 
         public override void OnEnter()
         {
+            if (characterBody.GetComponent<ConquerorController>().isUsingMunch)
+            {
+                outer.SetNextStateToMain(); // immediately cancel to base state
+                return;
+            }
+
+            characterBody.GetComponent<ConquerorController>().isUsingMunch = true;
+
             duration = baseDuration / attackSpeedStat;
             fireTime = firePercentTime * duration;
             characterBody.SetAimTimer(2f);
             muzzleString = "Muzzle";
             hasFired = false;
 
-            if (characterBody.GetComponent<ConquerorController>().bagDeployed == false)
+            characterBody.AddTimedBuff(RoR2Content.Buffs.HiddenInvincibility, duration);
+
+            CreateTransmitterExploFX(Util.GetCorePosition(characterBody.gameObject));
+
+            if (characterBody.GetComponent<ConquerorController>().distanceToOwner > 18)
             {
                 Util.PlaySound("Play_voidman_R_activate", gameObject);
                 Util.PlaySound("Play_chef_skill1_return", gameObject);
-                Util.PlaySound("Play_scav_backpack_open", gameObject);
+                Util.PlaySound("Play_imp_attack_blink", gameObject);
 
-
+                this.modelTransform = base.GetModelTransform();
+                if (this.modelTransform)
+                {
+                    this.characterModel = this.modelTransform.GetComponent<CharacterModel>();
+                    this.hurtboxGroup = this.modelTransform.GetComponent<HurtBoxGroup>();
+                }
+                if (this.characterModel)
+                {
+                    CharacterModel characterModel = this.characterModel;
+                    int num = characterModel.invisibilityCount;
+                    characterModel.invisibilityCount = num + 1;
+                }
+                if (this.hurtboxGroup)
+                {
+                    HurtBoxGroup hurtBoxGroup = this.hurtboxGroup;
+                    int num = hurtBoxGroup.hurtBoxesDeactivatorCounter + 1;
+                    hurtBoxGroup.hurtBoxesDeactivatorCounter = num;
+                }
 
                 PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1f);
             }
@@ -52,19 +121,240 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             {
                 Util.PlaySound("Play_ui_obj_eradicator_open", gameObject);
                 Util.PlaySound("Play_chef_skill1_return", gameObject);
-                Util.PlaySound("Play_scav_backpack_open", gameObject);
-
 
 
                 PlayAnimation("LeftArm, Override", "ShootGun", "ShootGun.playbackRate", 1f);
             }
+            initialPosition = Util.GetCorePosition(base.gameObject);
 
             base.OnEnter();
+
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (!hasFired)
+            {
+                if (fixedAge >= fireTime)
+                {
+                    Fire();
+                    hasFired = true;
+                }
+                base.characterMotor.velocity = Vector3.zero;
+            }
+            if (fixedAge >= duration && isAuthority)
+            {
+                outer.SetNextStateToMain();
+                return;
+            }
+        }
+        private void Fire()
+        {
+            if (NetworkServer.active)
+            {
+                Vector3 body = Util.GetCorePosition(base.gameObject);
+
+                if (characterBody.GetComponent<ConquerorController>().distanceToOwner > 18)
+                {
+
+                    Ray aimRay = base.GetAimRay();
+                    Vector3 origin = base.characterBody.corePosition;
+                    Vector3 direction = aimRay.direction.normalized;
+                    float maxDistance = 24f;
+
+                    RaycastHit hit;
+                    Vector3 teleportDestination;
+
+                    if (Physics.Raycast(origin, direction, out hit, maxDistance, LayerIndex.world.mask | LayerIndex.enemyBody.mask))
+                    {
+                        teleportDestination = hit.point;
+                    }
+                    else
+                    {
+                        teleportDestination = origin + direction.normalized * maxDistance;
+                    }
+
+                    CreateBlinkFX(origin, teleportDestination);
+
+                    base.characterMotor.Motor.SetPosition(teleportDestination);
+
+                    CreateVoidspikeExploFX(teleportDestination);
+                    CreateShatterspleenImpactFX(body, 20f);
+
+                    //ProcChainMask procChainMask = default(ProcChainMask);
+                    Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
+                    Util.PlaySound("Play_gup_step", gameObject);
+                    Util.PlaySound("Play_voidDevastator_step", gameObject);
+
+                    bleedblast = new BlastAttack();
+                    bleedblast.radius = 20f;
+                    bleedblast.attacker = gameObject;
+                    bleedblast.inflictor = gameObject;
+                    bleedblast.teamIndex = TeamIndex.Player;
+                    bleedblast.procCoefficient = 1f;
+                    bleedblast.baseForce = 0;
+                    bleedblast.canRejectForce = false;
+                    bleedblast.falloffModel = BlastAttack.FalloffModel.None;
+                    bleedblast.baseDamage = bleedblastDamageCoefficient * damageStat;
+                    bleedblast.damageType = DamageType.BleedOnHit;
+                    bleedblast.crit = RollCrit();
+                    bleedblast.position = teleportDestination;
+                    bleedblast.Fire();
+
+                    base.characterMotor.velocity.y = 0f;
+                    base.characterMotor.Motor.ForceUnground(0.1f);
+                    if (NetworkServer.active)
+                    {
+                        Util.CleanseBody(base.characterBody, true, false, false, true, true, true);
+                    }
+                }
+                else
+                {
+                    //SUCK IT BITCH
+                    Util.PlaySound("Play_gup_step", gameObject);
+                    Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
+                    Util.PlaySound("Play_voidDevastator_step", base.gameObject);
+                    Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
+
+                    CreateShatterspleenImpactFX(body, 7f);
+
+                    bleeddetector = new BlastAttack();
+                    bleeddetector.radius = 50f;
+                    bleeddetector.attacker = gameObject;
+                    bleeddetector.inflictor = gameObject;
+                    bleeddetector.teamIndex = TeamIndex.Player;
+                    bleeddetector.procCoefficient = 0f;
+                    //pullblast.baseForce = -2000;
+                    bleeddetector.canRejectForce = false;
+                    bleeddetector.falloffModel = BlastAttack.FalloffModel.None;
+                    bleeddetector.baseDamage = 0;
+                    bleeddetector.damageType = DamageType.Stun1s;
+                    bleeddetector.crit = RollCrit();
+                    bleeddetector.position = body;
+                    BlastAttack.Result targetsHit = bleeddetector.Fire();
+                    Log.Debug("Bleeddetector targets hit:" + targetsHit.hitCount);
+                    for (int i = 0; i < targetsHit.hitCount; i++)
+                    {
+                        HealthComponent hc = targetsHit.hitPoints[i].hurtBox.healthComponent;
+                        CharacterBody nmebody = hc.body;
+
+                        int bleedStacks = 0;
+                        DotController dotController = DotController.FindDotController(nmebody.gameObject);
+                        if (dotController != null)
+                        {
+                            foreach (var dot in dotController.dotStackList)
+                            {
+                                if (dot.dotIndex == DotController.DotIndex.Bleed)
+                                {
+                                    bleedStacks++;
+                                }
+                            }
+                            if (bleedStacks > 0)
+                            {
+                                for (int j = dotController.dotStackList.Count - 1; j >= 0; j--)
+                                {
+                                    var dotStack = dotController.dotStackList[j];
+                                    if (dotStack.dotIndex == DotController.DotIndex.Bleed)
+                                    {
+                                        dotController.RemoveDotStackAtServer(j);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Log.Debug($"DOT CONTROLLER IS NULL NOW FOR NO FUCKING REASON");
+                        }
+
+
+                        bool isFlyer = nmebody.isFlying || (nmebody.characterMotor && (nmebody.characterMotor.isFlying || !nmebody.characterMotor.isGrounded));
+
+                        Vector3 enemyPosition = nmebody.corePosition;
+                        Vector3 relativeDirection = (enemyPosition - body);
+                        relativeDirection.Normalize();
+
+                        float distance = 4.5f;
+                        float delay = UnityEngine.Random.Range(.8f, 1f);
+
+
+                        //safetp pos
+                        Vector3 targetPosition = body + relativeDirection * distance;
+                        RaycastHit hit;
+                        if (Physics.Raycast(targetPosition + Vector3.up * 5f, Vector3.down, out hit, 10f, LayerIndex.world.mask))
+                        {
+                            targetPosition = hit.point + Vector3.up * 0.1f;
+                        }
+
+
+                        Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+
+                        RoR2.Run.instance.StartCoroutine(TeleportandExplodeEnemyAfterDelay(nmebody, targetPosition, delay, bleedStacks));
+
+                        Log.Debug($"Bleedstacks on target hit: {bleedStacks}");
+                    }
+                }
+            }
+        }
+
+        private IEnumerator TeleportandExplodeEnemyAfterDelay(CharacterBody nmebody, Vector3 targetPosition, float delay, int bleedstacks)
+        {
+
+            CreateTransmitterExploFX(Util.GetCorePosition(nmebody.gameObject));
+            yield return new WaitForSeconds(delay);
+
+            //teleport
+            if (nmebody && nmebody.characterMotor)
+            {
+                nmebody.characterMotor.Motor.SetPosition(targetPosition);
+                nmebody.characterMotor.velocity = Vector3.zero;
+                nmebody.characterMotor.Motor.ForceUnground(0.1f);
+                SmallHop(nmebody.characterMotor, 3f);
+            }
+            else if (nmebody && nmebody.transform)
+            {
+                nmebody.transform.position = targetPosition;
+            }
+
+            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+            this.CreateBlinkFX(Util.GetCorePosition(nmebody.gameObject), Util.GetCorePosition(base.gameObject));
+
+            //explode
+            yield return new WaitForSeconds(.5f);
+
+            if (nmebody != null)
+            {
+                if (bleedstacks > 0)
+                {
+                    bleedburst = new BlastAttack();
+                    bleedburst.radius = 7f;
+                    bleedburst.attacker = gameObject;
+                    bleedburst.inflictor = gameObject;
+                    bleedburst.teamIndex = TeamIndex.Player;
+                    bleedburst.procCoefficient = 1f;
+                    //eyeblastpull.baseForce = -2000;
+                    bleedburst.canRejectForce = false;
+                    bleedburst.falloffModel = BlastAttack.FalloffModel.Linear;
+                    bleedburst.baseDamage = ConquerorStaticValues.eyeblastsecondaryblastDamageCoefficient * damageStat * bleedstacks;
+                    bleedburst.damageType = DamageType.Generic;
+                    bleedburst.crit = RollCrit();
+                    bleedburst.position = nmebody.corePosition;
+                    bleedburst.Fire();
+
+                    CreateShatterspleenExploFX(Util.GetCorePosition(nmebody));
+
+                    Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+                    Util.PlaySound("Play_imp_overlord_attack1_pop", nmebody.gameObject);
+                    Util.PlaySound("Play_voidDevastator_step", nmebody.gameObject);
+
+                }
+            }
         }
 
         public override void OnExit()
         {
-            if (NetworkServer.active)
+            /*if (NetworkServer.active)
             {
                 baseMaxUtilityStock = (float)base.skillLocator.GetSkill(SkillSlot.Utility).maxStock;
                 utilityStock = (float)base.skillLocator.GetSkill(SkillSlot.Utility).stock;
@@ -74,136 +364,72 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     int stock = skill.stock;
                     skill.stock = stock + 1;
                 }
+            }*/
+            if (this.characterModel)
+            {
+                CharacterModel characterModel = this.characterModel;
+                int num = characterModel.invisibilityCount;
+                characterModel.invisibilityCount = num - 1;
             }
+            if (this.hurtboxGroup)
+            {
+                HurtBoxGroup hurtBoxGroup = this.hurtboxGroup;
+                int num = hurtBoxGroup.hurtBoxesDeactivatorCounter - 1;
+                hurtBoxGroup.hurtBoxesDeactivatorCounter = num;
+            }
+
+            characterBody.GetComponent<ConquerorController>().isUsingMunch = false;
             base.OnExit();
             outer.SetNextStateToMain();
         }
 
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            if (!hasFired)
-            {
-                if (fixedAge >= fireTime)
-                {
-                    Fire();
-                }
-            }
-
-            if (fixedAge >= duration && isAuthority)
-            {
-                outer.SetNextStateToMain();
-                return;
-            }
-        }
-
-        private IEnumerator ExplodeEnemyAfterDelay(CharacterBody nmebody, float delay)
-        {
-            yield return new WaitForSeconds(delay);
-
-            secondaryeyeblast = new BlastAttack();
-            secondaryeyeblast.radius = 6.5f;
-            secondaryeyeblast.attacker = gameObject;
-            secondaryeyeblast.inflictor = gameObject;
-            secondaryeyeblast.teamIndex = TeamIndex.Player;
-            secondaryeyeblast.procCoefficient = 1f;
-            //eyeblastpull.baseForce = -2000;
-            secondaryeyeblast.canRejectForce = false;
-            secondaryeyeblast.falloffModel = BlastAttack.FalloffModel.Linear;
-            secondaryeyeblast.baseDamage = ConquerorStaticValues.eyeblastsecondaryblastDamageCoefficient * damageStat;
-            secondaryeyeblast.damageType = DamageType.BleedOnHit;
-            secondaryeyeblast.crit = RollCrit();
-            secondaryeyeblast.position = nmebody.corePosition;
-            secondaryeyeblast.Fire();
-
-            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
-            Util.PlaySound("Play_imp_overlord_attack1_pop", nmebody.gameObject);
-            Util.PlaySound("Play_voidDevastator_step", nmebody.gameObject);
-
-        }
-
-        private void Fire()
-        {
-            if (NetworkServer.active)
-            {
-                if (characterBody.GetComponent<ConquerorController>().bagDeployed == false)
-                {
-                    ProcChainMask procChainMask = default(ProcChainMask);
-                    Util.PlaySound("Play_voidDevastator_m2_secondary_explo", gameObject);
-                    Util.PlaySound("Play_gup_step", gameObject);
-                    Util.PlaySound("Play_voidDevastator_step", gameObject);
-                    //Util.PlaySound("Play_ui_obj_eradicator_open", base.gameObject);
-
-                    characterBody.AddTimedBuff(ConquerorBuffs.satiatedBuff, 4f);
-
-                    if (selfHealFraction > 0f)
-                    {
-                        base.healthComponent.HealFraction(selfHealFraction, procChainMask);
-                    }
-                    hasFired = true;
-                }
-                else
-                {
-                    Util.PlaySound("Play_gup_step", gameObject);
-                    Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
-                    Util.PlaySound("Play_voidDevastator_step", base.gameObject);
-                    Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
-
-
-                    eyeblastinit = new BlastAttack();
-                    eyeblastinit.radius = 15f;
-                    eyeblastinit.attacker = gameObject;
-
-                    eyeblastinit.inflictor = gameObject;
-                    eyeblastinit.teamIndex = TeamIndex.Player;
-                    eyeblastinit.procCoefficient = .6f;
-                    eyeblastinit.baseForce = 300;
-                    eyeblastinit.canRejectForce = false;
-                    eyeblastinit.falloffModel = BlastAttack.FalloffModel.None;
-                    eyeblastinit.baseDamage = ConquerorStaticValues.eyeblastinitDamageCoefficient * damageStat;
-                    eyeblastinit.damageType = DamageType.Generic;
-                    eyeblastinit.crit = RollCrit();
-                    eyeblastinit.position = this.characterBody.corePosition;
-                    
-                    BlastAttack.Result targetsHit = eyeblastinit.Fire();
-                    Log.Debug("Targets hit:" + targetsHit.hitCount);
-                    for (int i = 0; i < targetsHit.hitCount; i++)
-                    {
-                        HealthComponent hc = targetsHit.hitPoints[i].hurtBox.healthComponent;
-                        CharacterBody nmebody = hc.body;
-
-                        float delay = UnityEngine.Random.Range(1f, 1.5f);
-                        RoR2.Run.instance.StartCoroutine(ExplodeEnemyAfterDelay(nmebody, delay));
-
-                    }
-                    hasFired = true;
-                }
-            }
-        }
-
-        /*public Vector3 GetEyePullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)
-        {
-            Vector3 distanceVector = (targetPos - startPos);
-            Vector2 xzDistanceVec = new Vector2(distanceVector.x, distanceVector.z); // 
-            float distanceToTarget = xzDistanceVec.magnitude;
-            float timeToTarget = Mathf.Min(distanceToTarget * 0.07f, 1);
-
-            Vector2 normailzedDistvec = xzDistanceVec / distanceToTarget;
-            float y = isFlyer ? distanceVector.y : Mathf.Max(Trajectory.CalculateInitialYSpeed(timeToTarget, distanceVector.y), 6);
-            float travelRate = distanceToTarget / timeToTarget;
-            Vector3 direction = new Vector3(normailzedDistvec.x * travelRate, y, normailzedDistvec.y * travelRate);
-            return direction;
-        }*/
-        private void CreateBlinkEffect(Vector3 origin)
+        //effects
+        private void CreateBlinkFX(Vector3 origin, Vector3 destination)
         {
             EffectData effectData = new EffectData();
-            effectData.rotation = Util.QuaternionSafeLookRotation(base.characterBody.corePosition);
             effectData.origin = origin;
+            effectData.rotation = Util.QuaternionSafeLookRotation(origin - destination);
+            EffectManager.SpawnEffect(EntityStates.ImpMonster.BlinkState.blinkPrefab, effectData, false);
         }
-
-        public override InterruptPriority GetMinimumInterruptPriority()
+        private void CreateTransmitterExploFX(Vector3 origin)
         {
-            return InterruptPriority.PrioritySkill;
+            EffectData effectData = new EffectData();
+            effectData.rotation = Util.QuaternionSafeLookRotation(forwardDirection);
+            effectData.origin = origin;
+            effectData.scale = 3f;
+            EffectManager.SpawnEffect(transmitterExplode, effectData, false);
+        }
+        private void CreateShatterspleenExploFX(Vector3 origin)
+        {
+            EffectData effectData = new EffectData();
+            //effectData.rotation = Util.QuaternionSafeLookRotation(forwardDirection);
+            effectData.origin = origin;
+            effectData.scale = 6f;
+            EffectManager.SpawnEffect(shatterspleenExplode, effectData, false);
+        }
+        private void CreateShatterspleenImpactFX(Vector3 origin, float scale)
+        {
+            EffectData effectData = new EffectData();
+            //effectData.rotation = Util.QuaternionSafeLookRotation(forwardDirection);
+            effectData.origin = origin;
+            effectData.scale = scale;
+            EffectManager.SpawnEffect(shatterspleenImpact, effectData, false);
+        }
+        private void CreateVoidspikeExploFX(Vector3 origin)
+        {
+            EffectData effectData = new EffectData();
+            //effectData.rotation = Util.QuaternionSafeLookRotation(forwardDirection);
+            effectData.origin = origin;
+            effectData.scale = 5f;
+            EffectManager.SpawnEffect(voidspikeExplode, effectData, false);
+        }
+        private void CreateImpOverlordDepartFX(Vector3 origin)
+        {
+            EffectData effectData = new EffectData();
+            //effectData.rotation = Util.QuaternionSafeLookRotation(forwardDirection);
+            effectData.origin = origin;
+            effectData.scale = 10f;
+            EffectManager.SpawnEffect(impbossBlink, effectData, false);
         }
     }
 }

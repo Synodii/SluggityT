@@ -12,7 +12,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             Modules.Content.AddEntityState(typeof(Advance));
 
-            Modules.Content.AddEntityState(typeof(RopeBackpack));
+            Modules.Content.AddEntityState(typeof(  RopeBackpackFire));
         }
     }
 }

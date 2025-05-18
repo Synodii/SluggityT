@@ -19,16 +19,16 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             procCoefficient = 1f;
             pushForce = 300f;
             bonusForce = Vector3.zero;
-            baseDuration = 1f;
+            baseDuration = .7f;
             //moddedDamageTypeHolder.Add(DamageTypes.MarkForScrounge);
 
             //0-1 multiplier of baseduration, used to time when the hitbox is out (usually based on the run time of the animation)
             //for example, if attackStartPercentTime is 0.5, the attack will start hitting halfway through the ability. if baseduration is 3 seconds, the attack will start happening at 1.5 seconds
-            attackStartPercentTime = 0.3f;
-            attackEndPercentTime = 0.7f;
+            attackStartPercentTime = 0.08f;
+            attackEndPercentTime = 0.75f;
 
             //this is the point at which the attack can be interrupted by itself, continuing a combo
-            earlyExitPercentTime = 1f;
+            earlyExitPercentTime = .8f;
 
             hitStopDuration = 0.012f;
             attackRecoil = 0.5f;
@@ -44,7 +44,12 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             
             if (swingIndex == 2)
             {
-                attack.damageType = RoR2.DamageType.BonusToLowHealth;
+                attackStartPercentTime = 0.2f;
+                attackEndPercentTime = 0.85f;
+                baseDuration = 1.3f;
+                earlyExitPercentTime = 1f;
+                attack.damageType = RoR2.DamageType.BleedOnHit;
+                damageCoefficient = ConquerorStaticValues.thirdswingDamageCoefficient;
                 //moddedDamageTypeHolder.Add(DamageTypes.MarkForScrounge);
                 //attack.damageType = RoR2.DamageType.BleedOnHit
             }
