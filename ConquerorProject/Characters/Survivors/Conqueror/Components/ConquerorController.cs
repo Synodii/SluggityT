@@ -169,11 +169,6 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             comboCount = 1;
             isInCombo = false;
 
-            this.skillLocator.utility.UnsetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxe2, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
-            this.skillLocator.utility.UnsetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxe3, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
-            this.skillLocator.utility.UnsetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxe4, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
-
-
             RoR2.GenericSkill utilitySkill = this.skillLocator.utility;
             if (utilitySkill != null)
             {

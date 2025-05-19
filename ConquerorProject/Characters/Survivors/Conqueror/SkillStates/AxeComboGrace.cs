@@ -1,6 +1,5 @@
 ﻿using ConquerorMod.Characters.Survivors.Conqueror.Content;
 using ConquerorMod.Modules.BaseStates;
-using ConquerorMod.Survivors.Conqueror;
 using ConquerorMod.Survivors.Conqueror.Components;
 using ConquerorMod.Survivors.Conqueror.SkillStates;
 using EntityStates;
@@ -50,16 +49,13 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.SkillStates
             switch (combo.comboCount)
             {
                 case 2:
-                    this.skillLocator.utility.SetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxe2, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
-                    this.skillLocator.utility.UnsetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxeGrace, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
+                    outer.SetNextState(new AxeCombo2());
                     break;
                 case 3:
-                    this.skillLocator.utility.SetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxe3, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
-                    this.skillLocator.utility.UnsetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxeGrace, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
+                    outer.SetNextState(new AxeCombo3());
                     break;
                 case 4:
-                    this.skillLocator.utility.SetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxe4, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
-                    this.skillLocator.utility.UnsetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxeGrace, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
+                    outer.SetNextState(new AxeCombo4());
                     break;
                 default:
                     combo.ResetCombo();

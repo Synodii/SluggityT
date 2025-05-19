@@ -139,7 +139,11 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 Util.PlaySound("Play_loader_R_variant_slam", base.gameObject);
                 
                 var graceState = new AxeComboGrace();
-                this.skillLocator.utility.SetSkillOverride(this.gameObject, ConquerorSurvivor.utilityAxeGrace, RoR2.GenericSkill.SkillOverridePriority.Upgrade);
+                outer.SetNextState(graceState);
+                if (combo.comboCount >= 4)
+                {
+                    outer.SetNextStateToMain();
+                }
             }
         }
 
