@@ -1,4 +1,4 @@
-﻿/*using HG;
+﻿using HG;
 using Newtonsoft.Json.Linq;
 using R2API;
 using RoR2;
@@ -19,63 +19,56 @@ using ConquerorMod.Survivors.Conqueror;
 
 namespace ConquerorMod.Characters.Survivors.Conqueror.Content
 {
-    internal class DamageTypes
+    public static class DamageTypes
     {
-        public static DamageAPI.ModdedDamageType MarkForScrounge;
+        public static DamageAPI.ModdedDamageType BleedOnHitbutCooler;
+        public static DamageAPI.ModdedDamageType ConquerorKnockup;
         public static DamageAPI.ModdedDamageType Default;
 
 
-        internal void Init()
+        internal static void Init()
         {
-            MarkForScrounge = DamageAPI.ReserveDamageType();
+            BleedOnHitbutCooler = DamageAPI.ReserveDamageType();
+            ConquerorKnockup = DamageAPI.ReserveDamageType();
             Default = DamageAPI.ReserveDamageType();
 
             Hook();
         }
 
-        private void Hook()
+        private static void Hook()
         {
-            On.RoR2.GlobalEventManager.OnCharacterDeath += GlobalEventManager_OnCharacterDeath;
-            GlobalEventManager.onServerDamageDealt += GlobalEventManager_ServerDamageDealt;
+            GlobalEventManager.onServerDamageDealt += GlobalEventManager_onServerDamageDealt;
         }
 
-        private void GlobalEventManager_ServerDamageDealt(DamageReport damageReport)
+        private static void GlobalEventManager_onServerDamageDealt(DamageReport damageReport)
         {
             if (damageReport == null || damageReport.damageInfo == null) return;
 
-            if (DamageAPI.HasModdedDamageType(damageReport.damageInfo, MarkForScrounge))
+            if (DamageAPI.HasModdedDamageType(damageReport.damageInfo, BleedOnHitbutCooler))
             {
                 if (damageReport.victimBody)
                 {
-                    damageReport.victimBody.AddTimedBuff(ConquerorBuffs.conqExecutionMark, 2f);
+                    DotController.InflictDot(damageReport.victim.gameObject, damageReport.attacker, DotController.DotIndex.Bleed, 8f, .5f);
                 }
             }
-        }
 
-        private void GlobalEventManager_OnCharacterDeath(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, GlobalEventManager self, DamageReport damageReport)
-        {
-            orig(self, damageReport);
-
-            var damageInfo = damageReport?.damageInfo;
-            if (damageInfo == null || !DamageAPI.HasModdedDamageType(damageInfo, MarkForScrounge))
-                return;
-
-            if (!damageReport.attacker || !damageReport.attackerBody)
-                return;
-
-            if (damageReport.attackerBody.bodyIndex != ConquerorSurvivor.conquerorBodyIndex)
-                return;
-
-            var skillLocator = damageReport.attackerBody.skillLocator;
-            if (skillLocator && skillLocator.secondary)
+            if (DamageAPI.HasModdedDamageType(damageReport.damageInfo, ConquerorKnockup))
             {
-                skillLocator.secondary.rechargeStopwatch += 1f;
-
-                if (skillLocator.secondary.rechargeStopwatch > skillLocator.secondary.finalRechargeInterval)
+                if (!damageReport.victim.body) return;
+                //apply knockup scaled with mass if victim has rigidbody. Do not apply knockup if victim is airborne.
+                if (damageReport.victim.body && damageReport.victim.body.characterMotor)
                 {
-                    skillLocator.secondary.rechargeStopwatch = skillLocator.secondary.finalRechargeInterval;
+                    damageReport.damageInfo.force = damageReport.victimBody.characterMotor.isGrounded ? (damageReport.victimBody.rigidbody && damageReport.victimBody.rigidbody.mass < 700 ? damageReport.victimBody.rigidbody.mass : 0.1f) * new Vector3(0, 15f, 0) : Vector3.zero;
+                    
+                    if (damageReport.victim.body.characterMotor.isGrounded) damageReport.victim.body.characterMotor.Motor.ForceUnground();
+                    damageReport.victim?.TakeDamageForce(damageReport.damageInfo.force);
+
+                    if (damageReport.victim.body.isFlying || (damageReport.victim.body.characterMotor && (damageReport.victim.body.characterMotor.isFlying || !damageReport.victim.body.characterMotor.isGrounded)))
+                    {
+                        damageReport.victim?.TakeDamageForce(-damageReport.damageInfo.force * 2.5f);
+                    }
                 }
             }
         }
     }
-}*/
+}

@@ -22,6 +22,8 @@ using System.Linq;
 using static RoR2.CameraTargetParams;
 using TMPro;
 using static UnityEngine.UI.Image;
+using static R2API.DamageAPI;
+using ConquerorMod.Characters.Survivors.Conqueror.Content;
 //using ConquerorMod.Characters.Survivors.Conqueror.Content;
 
 
@@ -198,7 +200,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     bleedblast.canRejectForce = false;
                     bleedblast.falloffModel = BlastAttack.FalloffModel.None;
                     bleedblast.baseDamage = bleedblastDamageCoefficient * damageStat;
-                    bleedblast.damageType = DamageType.BleedOnHit;
+                    bleedblast.AddModdedDamageType(DamageTypes.BleedOnHitbutCooler);
                     bleedblast.crit = RollCrit();
                     bleedblast.position = teleportDestination;
                     bleedblast.Fire();
@@ -275,7 +277,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                         Vector3 relativeDirection = (enemyPosition - body);
                         relativeDirection.Normalize();
 
-                        float distance = 4.5f;
+                        float distance = 6f;
                         float delay = UnityEngine.Random.Range(.8f, 1f);
 
 
@@ -300,32 +302,31 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         private IEnumerator TeleportandExplodeEnemyAfterDelay(CharacterBody nmebody, Vector3 targetPosition, float delay, int bleedstacks)
         {
-
-            CreateTransmitterExploFX(Util.GetCorePosition(nmebody.gameObject));
-            yield return new WaitForSeconds(delay);
-
-            //teleport
-            if (nmebody && nmebody.characterMotor)
+            if (bleedstacks > 0)
             {
-                nmebody.characterMotor.Motor.SetPosition(targetPosition);
-                nmebody.characterMotor.velocity = Vector3.zero;
-                nmebody.characterMotor.Motor.ForceUnground(0.1f);
-                SmallHop(nmebody.characterMotor, 3f);
-            }
-            else if (nmebody && nmebody.transform)
-            {
-                nmebody.transform.position = targetPosition;
-            }
+                CreateTransmitterExploFX(Util.GetCorePosition(nmebody.gameObject));
+                yield return new WaitForSeconds(delay);
 
-            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
-            this.CreateBlinkFX(Util.GetCorePosition(nmebody.gameObject), Util.GetCorePosition(base.gameObject));
+                //teleport
+                if (nmebody && nmebody.characterMotor)
+                {
+                    nmebody.characterMotor.Motor.SetPosition(targetPosition);
+                    nmebody.characterMotor.velocity = Vector3.zero;
+                    nmebody.characterMotor.Motor.ForceUnground(0.1f);
+                    SmallHop(nmebody.characterMotor, 3f);
+                }
+                else if (nmebody && nmebody.transform)
+                {
+                    nmebody.transform.position = targetPosition;
+                }
 
-            //explode
-            yield return new WaitForSeconds(.5f);
+                Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+                this.CreateBlinkFX(Util.GetCorePosition(nmebody.gameObject), Util.GetCorePosition(base.gameObject));
 
-            if (nmebody != null)
-            {
-                if (bleedstacks > 0)
+                //explode
+                yield return new WaitForSeconds(.5f);
+
+                if (nmebody != null)
                 {
                     bleedburst = new BlastAttack();
                     bleedburst.radius = 7f;
@@ -336,7 +337,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     //eyeblastpull.baseForce = -2000;
                     bleedburst.canRejectForce = false;
                     bleedburst.falloffModel = BlastAttack.FalloffModel.Linear;
-                    bleedburst.baseDamage = ConquerorStaticValues.eyeblastsecondaryblastDamageCoefficient * damageStat * bleedstacks;
+                    bleedburst.baseDamage = ConquerorStaticValues.specialeyeDamageCoefficient * damageStat * bleedstacks;
                     bleedburst.damageType = DamageType.Generic;
                     bleedburst.crit = RollCrit();
                     bleedburst.position = nmebody.corePosition;
@@ -404,7 +405,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             EffectData effectData = new EffectData();
             //effectData.rotation = Util.QuaternionSafeLookRotation(forwardDirection);
             effectData.origin = origin;
-            effectData.scale = 6f;
+            effectData.scale = 7f;
             EffectManager.SpawnEffect(shatterspleenExplode, effectData, false);
         }
         private void CreateShatterspleenImpactFX(Vector3 origin, float scale)

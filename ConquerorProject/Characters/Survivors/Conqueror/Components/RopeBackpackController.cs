@@ -21,6 +21,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public ProjectileOverlapAttack projOverlap;
         public ProjectileSimple projSimple;
         public BuffWard buffward;
+        public Transform ropeIndicator;
         ConquerorController objTracker;
 
         bool isFlying = false;
@@ -38,6 +39,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
         private bool isWaitingToRecall;
         bool hasStuck = false;
+        bool isImmunetoFallDamage = false;
         public Vector3 backpackTargetPos; // where the rope landed
         public Vector3 playerPos;
 
@@ -45,22 +47,13 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
         void Awake()
         {
-            Log.Debug($"AWAKE position: {transform.position}");
-            Log.Debug($"Awake Rigidbody position: {rb.position}, velocity: {rb.velocity}, isKinematic: {rb.isKinematic}");
         }
 
         void Start()
         {
-            Log.Debug($"START position: {transform.position}");
-            Log.Debug($"START Rigidbody position: {rb.position}, velocity: {rb.velocity}, isKinematic: {rb.isKinematic}");
-
-            rb.isKinematic = false;
-            rb.useGravity = true;
-
-            rb.position = projectilespawnPosition;
             ownerTransform = controller.owner.transform;
-            objTracker = ownerTransform.GetComponent<ConquerorController>();
 
+            objTracker = ownerTransform.GetComponent<ConquerorController>();
 
             if (objTracker != null)
             {
@@ -73,30 +66,45 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         {
             if (isFlying) return;
 
-            Log.Debug("[RopeBackpack] STUCK POSITION: " + transform.position);
-            
+            hasStuck = true;
 
-            //remove motion and collision in order to prevent enemy sliding
-            backpackCollider.enabled = false;
-            rb.velocity = Vector3.zero;
-            //rb.drag = 0;
-            //rb.angularDrag = 0;
-            //rb.mass = 0; 
-            rb.useGravity = false;
-            projSimple.SetForwardSpeed(0);
+            ropeIndicator.localScale = Vector3.one * 2;
+            buffward.enabled = true;
+            objTracker.characterBody.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
+            isImmunetoFallDamage = true;
+
+            if (objTracker.distanceToOwner > 10f && objTracker.characterBody && objTracker.characterMotor)
+            {
+                Vector3 pullVelocity = GetPullVelocity(transform.position, playerPos, false);
+
+                Log.Debug(pullVelocity);
+
+                objTracker.characterMotor.velocity = pullVelocity;
+                objTracker.characterMotor.Motor.ForceUnground(0.5f);
+                objTracker.characterMotor.disableAirControlUntilCollision = true;
+            }
         }
         void Update()
         {
-            //lineRenderer.SetPosition(0, transform.position);
-            //lineRenderer.SetPosition(1, Vector3.Lerp(transform.position, objTracker.fishingPoleTip.position, 0.5f) + (Vector3.up * 0.1f));
-            //lineRenderer.SetPosition(2, objTracker.fishingPoleTip.position);
+            if (isFlying)
+            {
+                buffward.radius = Mathf.Lerp(18f, 0f, Time.deltaTime);
+            }
         }
+
 
         void FixedUpdate()
         {
             playerPos = objTracker.characterBody.footPosition;
-
+             
             if (controller.owner == null) Destroy(gameObject);
+
+            if (objTracker.characterMotor.isGrounded && isImmunetoFallDamage)
+            {
+                objTracker.characterBody.bodyFlags &= ~CharacterBody.BodyFlags.IgnoreFallDamage;
+                objTracker.characterMotor.velocity = Vector3.zero;
+                isImmunetoFallDamage = false;
+            }
 
             objTracker.distanceToOwner = Vector3.Distance(transform.position, ownerTransform.position);
             if (!isFlying)
@@ -104,7 +112,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                 if (objTracker.distanceToOwner > autoTriggerDistance)
                 {
                     objTracker.isManualRecall = false;
-                    StartCoroutine(DelayedFlyBack());
+                    StartCoroutine(FlyBack());
                 }
                 else if (objTracker.distanceToOwner > autoDropDistance)
                 {
@@ -144,8 +152,15 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                     }
                 }
             }
+            
         }
 
+        private void OnDestroy()
+        {
+            objTracker.ResetRopeSkill();
+            objTracker.characterBody.bodyFlags &= ~CharacterBody.BodyFlags.IgnoreFallDamage;
+            isImmunetoFallDamage = false;
+        }
 
         private Vector3 GetPullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)
         {
@@ -170,7 +185,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         private IEnumerator DelayedFlyBack()
         {
             isWaitingToRecall = true;
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0);
 
             if (!isFlying && objTracker.distanceToOwner > autoTriggerDistance)
             {
@@ -185,20 +200,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             Log.Debug("[BP] Flyback Start");
             Util.PlaySound("Play_scav_backpack_open", gameObject);
 
-            //fling
-            backpackTargetPos = transform.position;
-
-            if (objTracker.distanceToOwner > 18f && objTracker.characterBody && objTracker.characterMotor && objTracker.isManualRecall)
-            {
-                Vector3 pullVelocity = GetPullVelocity(backpackTargetPos, playerPos, false);
-
-                objTracker.characterMotor.velocity = pullVelocity;
-                objTracker.characterMotor.Motor.ForceUnground(0.1f);
-                Debug.DrawLine(playerPos, backpackTargetPos, Color.cyan, 2f);
-            }
-
             transform.localScale = new Vector3(0F, 0F, 0F);
-
 
             isFlying = true; //aka is being recalled
 

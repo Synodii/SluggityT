@@ -52,7 +52,7 @@ namespace ConquerorMod.Survivors.Conqueror
 
             #region Secondary
             Language.Add(prefix + "SECONDARY_MUNCH_NAME", "Imbibe");
-            Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>.  Refreshes 1 Utility stock. Hold up to 3. <style=cIsUtility>Becomes Smother while Special is active.</style>. REMOVE FROM THIS DESC AND MAKE ITS OWN BUT IM TOO LAZY: Crush an imp eye. exploding an area for <style=cIsDamage>{100f * ConquerorStaticValues.eyeblastinitDamageCoefficient}% damage</style>. After a delay, each enemy hit will explode again in a smaller radius for <style=cIsDamage>{100f * ConquerorStaticValues.eyeblastsecondaryblastDamageCoefficient}% damage</style>. Refreshes 1 Utility stock. Hold up to 3.");
+            Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>.  Refreshes 1 Utility stock. Hold up to 3. <style=cIsUtility>Becomes Smother while Special is active.</style>. REMOVE FROM THIS DESC AND MAKE ITS OWN BUT IM TOO LAZY: Crush an imp eye. exploding an area for <style=cIsDamage>{100f * 2}% damage</style>. After a delay, each enemy hit will explode again in a smaller radius for <style=cIsDamage>{100f * 2}% damage</style>. Refreshes 1 Utility stock. Hold up to 3.");
 
             Language.Add(prefix + "SECONDARY_CRUSH_NAME", "Smother");
             Language.Add(prefix + "SECONDARY_CRUSH_DESCRIPTION", Tokens.agilePrefix + $"insert token here");

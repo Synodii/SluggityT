@@ -1,6 +1,8 @@
 ﻿//using ConquerorMod.Characters.Survivors.Conqueror.Content;
+using ConquerorMod.Characters.Survivors.Conqueror.Content;
 using ConquerorMod.Modules.BaseStates;
 using EntityStates;
+using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -48,7 +50,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 attackEndPercentTime = 0.85f;
                 baseDuration = 1.3f;
                 earlyExitPercentTime = 1f;
-                attack.damageType = RoR2.DamageType.BleedOnHit;
+                attack.AddModdedDamageType(DamageTypes.BleedOnHitbutCooler);
                 damageCoefficient = ConquerorStaticValues.thirdswingDamageCoefficient;
                 //moddedDamageTypeHolder.Add(DamageTypes.MarkForScrounge);
                 //attack.damageType = RoR2.DamageType.BleedOnHit

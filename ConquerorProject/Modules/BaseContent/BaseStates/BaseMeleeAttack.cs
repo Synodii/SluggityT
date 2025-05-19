@@ -59,6 +59,7 @@ namespace ConquerorMod.Modules.BaseStates
             base.OnEnter();
             duration = baseDuration / attackSpeedStat;
             animator = GetModelAnimator();
+
             StartAimMode(0.5f + duration, false);
 
             PlayAttackAnimation();

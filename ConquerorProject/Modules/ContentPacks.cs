@@ -15,7 +15,6 @@ namespace ConquerorMod.Modules {
         public static List<GameObject> masterPrefabs = new List<GameObject>();
 
         public static List<BuffDef> buffDefs = new List<BuffDef>();
-
         public static List<GameObject> projectilePrefabs = new List<GameObject>();
 
         public static List<SurvivorDef> survivorDefs = new List<SurvivorDef>();

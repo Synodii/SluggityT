@@ -11,24 +11,18 @@ namespace ConquerorMod.Survivors.Conqueror
             get { return baseBackpackHitStop * hitStopMod; }
         }
 
-        public const float swingDamageCoefficient = 3.5f;
+        public const float swingDamageCoefficient = 3f;
 
-        public const float thirdswingDamageCoefficient = 4f;
+        public const float thirdswingDamageCoefficient = 3.5f;
 
         public const float warpeyeDamageCoefficient = 1.2f;
 
         //public const float chargedwarpDamageCoefficient = 5f;
 
-        public const float eyeblastsecondaryblastDamageCoefficient = 2.5f;
-
-        public const float eyeblastinitDamageCoefficient = .8f;
+        public const float specialeyeDamageCoefficient = 2.5f;
 
         public const float gigalaserDamageCoefficient = 18f;
 
-        public const float ropeduffelretrieveDamageCoefficient = 2f;
-
-        public const float apportduffelretrieveDamageCoefficient = 2f;
-
-        public const float chargeWarpHealthCost = .25f;
+        public const float axecomboDamageCoefficient = 4f;
     }
 }

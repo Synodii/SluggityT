@@ -23,7 +23,16 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
                 characterBody.GetComponent<ConquerorController>().isManualRecall = true;
 
-                base.skillLocator.special.DeductStock(1);
+                RoR2.GenericSkill specialSkill = this.skillLocator.special;
+                if (specialSkill != null)
+                {
+                    if (specialSkill.stock > 0)
+                    {
+                        specialSkill.DeductStock(1);
+                        specialSkill.rechargeStopwatch = 0f;
+                    }
+                }
+
                 ConquerorController objt = characterBody.GetComponent<ConquerorController>();
                 if (objt)
                 {

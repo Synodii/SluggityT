@@ -10,9 +10,9 @@ namespace ConquerorMod.Survivors.Conqueror
 
             Modules.Content.AddEntityState(typeof(Eye));
 
-            Modules.Content.AddEntityState(typeof(Advance));
+            Modules.Content.AddEntityState(typeof(AxeCombo1));
 
-            Modules.Content.AddEntityState(typeof(  RopeBackpackFire));
+            Modules.Content.AddEntityState(typeof(RopeBackpackCharge));
         }
     }
 }
