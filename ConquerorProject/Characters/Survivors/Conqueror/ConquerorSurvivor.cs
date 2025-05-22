@@ -5,12 +5,14 @@ using ConquerorMod.Modules;
 using ConquerorMod.Modules.Characters;
 using ConquerorMod.Survivors.Conqueror.Components;
 using ConquerorMod.Survivors.Conqueror.SkillStates;
+using EntityStates;
 using RoR2;
 using RoR2.Skills;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static RoR2.TeleporterInteraction;
 
 namespace ConquerorMod.Survivors.Conqueror
 {
@@ -34,16 +36,13 @@ namespace ConquerorMod.Survivors.Conqueror
         //used when registering your survivor's language tokens
         public override string survivorTokenPrefix => CONQUEROR_PREFIX;
 
-        public static SteppedSkillDef primaryAxe;
+        public static SkillDef primaryAxe;
 
-        public static SkillDef secondaryEye;
+        public static SkillDef utilityEye;
         //public static SkillDef secondaryCrush;
 
-        public static SkillDef utilityAxe1;
-        public static SkillDef utilityAxe2;
-        public static SkillDef utilityAxe3;
-        public static SkillDef utilityAxe4;
-        public static SkillDef utilityAxeGrace;
+        public static SkillDef secondaryAxe1;
+        public static SkillDef secondaryAxeComboManager;
 
         public static SkillDef specialRecallRopeBackpack;
         public static SkillDef specialRopeBackpack;
@@ -186,6 +185,8 @@ namespace ConquerorMod.Survivors.Conqueror
 
             Prefabs.AddEntityStateMachine(bodyPrefab, "Weapon");
             Prefabs.AddEntityStateMachine(bodyPrefab, "Weapon2");
+            Prefabs.AddEntityStateMachine(bodyPrefab, "Weapon3");
+            Prefabs.AddEntityStateMachine(bodyPrefab, "Weapon4");
         }
 
         #region skills
@@ -261,20 +262,37 @@ namespace ConquerorMod.Survivors.Conqueror
 
             //the primary skill is created using a constructor for a typical primary
             //it is also a SteppedSkillDef. Custom Skilldefs are very useful for custom behaviors related to casting a skill. see ror2's different skilldefs for reference
-            ConquerorSurvivor.primaryAxe = Skills.CreateSkillDef<SteppedSkillDef>(new SkillDefInfo
-                (
-                    "ConquerorAxe",
-                    CONQUEROR_PREFIX + "PRIMARY_AXE_NAME",
-                    CONQUEROR_PREFIX + "PRIMARY_AXE_DESCRIPTION",
-                    assetBundle.LoadAsset<Sprite>("texPrimaryIcon"),
-                    new EntityStates.SerializableEntityStateType(typeof(SkillStates.Overpower)),
-                    "Weapon",
-                    true
-                ));
-            //custom Skilldefs can have additional fields that you can set manually
-            primaryAxe.stepCount = 3;
-            primaryAxe.stepGraceDuration = 0.5f;
+            ConquerorSurvivor.primaryAxe = Skills.CreateSkillDef(new SkillDefInfo
+            {
+                skillName = "Overpower",
+                skillNameToken = CONQUEROR_PREFIX + "PRIMARY_AXE_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "PRIMARY_AXE_DESCRIPTION",
+                skillIcon = assetBundle.LoadAsset<Sprite>("texUtilityIcon"),
 
+                activationState = new EntityStates.SerializableEntityStateType(typeof(OverpowerCharge)),
+                activationStateMachineName = "Weapon",
+                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
+
+                baseRechargeInterval = 0,
+                baseMaxStock = 1,
+
+                rechargeStock = 1,
+                requiredStock = 0,
+                stockToConsume = 0,
+
+                resetCooldownTimerOnUse = false,
+                fullRestockOnAssign = true,
+                dontAllowPastMaxStocks = true,
+                mustKeyPress = true,
+                beginSkillCooldownOnSkillEnd = false,
+
+                isCombatSkill = true,
+                canceledFromSprinting = false,
+                cancelSprintingOnActivation = false,
+                forceSprintDuringState = false,
+
+            });
+            //custom Skilldefs can have additional fields that you can set manually
             Skills.AddPrimarySkills(bodyPrefab, primaryAxe);
         }
 
@@ -282,8 +300,76 @@ namespace ConquerorMod.Survivors.Conqueror
         {
             Skills.CreateGenericSkillWithSkillFamily(bodyPrefab, SkillSlot.Secondary);
 
-            //here is a basic skill def with all fields accounted for
-            ConquerorSurvivor.secondaryEye = Skills.CreateSkillDef(new SkillDefInfo
+
+            //here's a skilldef of a typical movement skill.
+            ConquerorSurvivor.secondaryAxe1 = Skills.CreateSkillDef(new SkillDefInfo
+            {
+                skillName = "Advance",
+                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
+                skillIcon = assetBundle.LoadAsset<Sprite>("texUtilityIcon"),
+
+                activationState = new EntityStates.SerializableEntityStateType(typeof(AxeCombo1)),
+                activationStateMachineName = "Weapon3",
+                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
+
+                baseRechargeInterval = 10f,
+                baseMaxStock = 1,
+
+                rechargeStock = 1,
+                requiredStock = 1,
+                stockToConsume = 1,
+
+                resetCooldownTimerOnUse = false,
+                fullRestockOnAssign = false,
+                dontAllowPastMaxStocks = false,
+                mustKeyPress = false,
+                beginSkillCooldownOnSkillEnd = true,
+
+                isCombatSkill = true,
+                canceledFromSprinting = false,
+                cancelSprintingOnActivation = true,
+                forceSprintDuringState = false,
+            });
+            ConquerorSurvivor.secondaryAxeComboManager = Skills.CreateSkillDef(new SkillDefInfo
+            {
+                skillName = "Advance",
+                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
+                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
+                skillIcon = assetBundle.LoadAsset<Sprite>("texUtilityIcon"),
+
+                activationState = new EntityStates.SerializableEntityStateType(typeof(Idle)),
+                activationStateMachineName = "Weapon3",
+                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
+
+                baseRechargeInterval = 10f,
+                baseMaxStock = 0,
+
+                rechargeStock = 1,
+                requiredStock = 1,
+                stockToConsume = 1,
+
+                resetCooldownTimerOnUse = false,
+                fullRestockOnAssign = false,
+                dontAllowPastMaxStocks = true,
+                mustKeyPress = false,
+                beginSkillCooldownOnSkillEnd = true,
+
+                isCombatSkill = true,
+                canceledFromSprinting = false,
+                cancelSprintingOnActivation = true,
+                forceSprintDuringState = false,
+            });
+            ;
+            Skills.AddSecondarySkills(bodyPrefab, secondaryAxe1);
+        }
+
+        private void AddUtiitySkills()
+        {
+            Skills.CreateGenericSkillWithSkillFamily(bodyPrefab, SkillSlot.Utility);
+
+
+            ConquerorSurvivor.utilityEye = Skills.CreateSkillDef(new SkillDefInfo
             {
                 skillName = "ConquerorMunch",
                 skillNameToken = CONQUEROR_PREFIX + "SECONDARY_MUNCH_NAME",
@@ -292,10 +378,10 @@ namespace ConquerorMod.Survivors.Conqueror
                 skillIcon = assetBundle.LoadAsset<Sprite>("texSecondaryIcon"),
 
                 activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.Eye)),
-                activationStateMachineName = "Weapon2",
+                activationStateMachineName = "Weapon4",
                 interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
 
-                baseRechargeInterval = 9f,
+                baseRechargeInterval = 6f,
                 baseMaxStock = 3,
 
                 rechargeStock = 1,
@@ -345,169 +431,8 @@ namespace ConquerorMod.Survivors.Conqueror
                 forceSprintDuringState = false,
             });*/
 
-            Skills.AddSecondarySkills(bodyPrefab, secondaryEye);
+            Skills.AddUtilitySkills(bodyPrefab, utilityEye);
             //Skills.AddSecondarySkills(bodyPrefab, secondaryCrush);
-
-        }
-
-        private void AddUtiitySkills()
-        {
-            Skills.CreateGenericSkillWithSkillFamily(bodyPrefab, SkillSlot.Utility);
-
-            //here's a skilldef of a typical movement skill.
-            ConquerorSurvivor.utilityAxe1 = Skills.CreateSkillDef(new SkillDefInfo
-            {
-                skillName = "Advance",
-                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
-                skillIcon = assetBundle.LoadAsset<Sprite>("texUtilityIcon"),
-
-                activationState = new EntityStates.SerializableEntityStateType(typeof(AxeCombo1)),
-                activationStateMachineName = "Weapon",
-                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
-
-                baseRechargeInterval = 13f,
-                baseMaxStock = 1,
-
-                rechargeStock = 1,
-                requiredStock = 1,
-                stockToConsume = 1,
-
-                resetCooldownTimerOnUse = false,
-                fullRestockOnAssign = false,
-                dontAllowPastMaxStocks = false,
-                mustKeyPress = false,
-                beginSkillCooldownOnSkillEnd = true,
-
-                isCombatSkill = true,
-                canceledFromSprinting = false,
-                cancelSprintingOnActivation = true,
-                forceSprintDuringState = false,
-            }); ;
-
-            ConquerorSurvivor.utilityAxe2 = Skills.CreateSkillDef(new SkillDefInfo
-
-            {
-                skillName = "Advance",
-                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
-                skillIcon = assetBundle.LoadAsset<Sprite>("texShotgunIcon"),
-
-                activationState = new EntityStates.SerializableEntityStateType(typeof(AxeCombo2)),
-                activationStateMachineName = "Weapon",
-                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
-
-                baseRechargeInterval = 0f,
-                baseMaxStock = 1,
-
-                rechargeStock = 1,
-                requiredStock = 1,
-                stockToConsume = 1,
-
-                resetCooldownTimerOnUse = false,
-                fullRestockOnAssign = false,
-                dontAllowPastMaxStocks = false,
-                mustKeyPress = false,
-                beginSkillCooldownOnSkillEnd = true,
-
-                isCombatSkill = true,
-                canceledFromSprinting = false,
-                cancelSprintingOnActivation = true,
-                forceSprintDuringState = false,
-            }); ;
-
-            ConquerorSurvivor.utilityAxe3 = Skills.CreateSkillDef(new SkillDefInfo
-            {
-                skillName = "Advance",
-                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
-                skillIcon = assetBundle.LoadAsset<Sprite>("texBazookaIcon"),
-
-                activationState = new EntityStates.SerializableEntityStateType(typeof(AxeCombo3)),
-                activationStateMachineName = "Weapon",
-                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
-
-                baseRechargeInterval = 0f,
-                baseMaxStock = 1,
-
-                rechargeStock = 1,
-                requiredStock = 1,
-                stockToConsume = 1,
-
-                resetCooldownTimerOnUse = false,
-                fullRestockOnAssign = false,
-                dontAllowPastMaxStocks = false,
-                mustKeyPress = false,
-                beginSkillCooldownOnSkillEnd = true,
-
-                isCombatSkill = true,
-                canceledFromSprinting = false,
-                cancelSprintingOnActivation = true,
-                forceSprintDuringState = false,
-            }); ;
-
-            ConquerorSurvivor.utilityAxe4 = Skills.CreateSkillDef(new SkillDefInfo
-            {
-                skillName = "Advance",
-                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
-                skillIcon = assetBundle.LoadAsset<Sprite>("texBoxingGlovesIcon"),
-
-                activationState = new EntityStates.SerializableEntityStateType(typeof(AxeCombo4)),
-                activationStateMachineName = "Weapon",
-                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
-
-                baseRechargeInterval = 0f,
-                baseMaxStock = 1,
-
-                rechargeStock = 1,
-                requiredStock = 1,
-                stockToConsume = 1,
-
-                resetCooldownTimerOnUse = false,
-                fullRestockOnAssign = false,
-                dontAllowPastMaxStocks = false,
-                mustKeyPress = false,
-                beginSkillCooldownOnSkillEnd = true,
-
-                isCombatSkill = true,
-                canceledFromSprinting = false,
-                cancelSprintingOnActivation = true,
-                forceSprintDuringState = false,
-            }); ;
-
-            ConquerorSurvivor.utilityAxeGrace = Skills.CreateSkillDef(new SkillDefInfo
-
-            {
-                skillName = "Advance",
-                skillNameToken = CONQUEROR_PREFIX + "UTILITY_WARP_NAME",
-                skillDescriptionToken = CONQUEROR_PREFIX + "UTILITY_WARP_DESCRIPTION",
-                skillIcon = assetBundle.LoadAsset<Sprite>("texPassiveIcon"),
-
-                activationState = new EntityStates.SerializableEntityStateType(typeof(AxeComboGrace)),
-                activationStateMachineName = "Weapon",
-                interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
-
-                baseRechargeInterval = 0f,
-                baseMaxStock = 1,
-
-                rechargeStock = 1,
-                requiredStock = 1,
-                stockToConsume = 1,
-
-                resetCooldownTimerOnUse = false,
-                fullRestockOnAssign = false,
-                dontAllowPastMaxStocks = false,
-                mustKeyPress = false,
-                beginSkillCooldownOnSkillEnd = true,
-
-                isCombatSkill = true,
-                canceledFromSprinting = false,
-                cancelSprintingOnActivation = true,
-                forceSprintDuringState = false,
-            }); ;
-            Skills.AddUtilitySkills(bodyPrefab, utilityAxe1);
-
         }
 
         private void AddSpecialSkills()

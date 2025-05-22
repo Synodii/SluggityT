@@ -37,14 +37,22 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public Animator animator;
         public Transform swordTip;
 
+        //secondary
         public int comboCount = 1;
+        public float comboResetTimer = 0f;
+        private float comboResetDuration = 5f;
         public bool isInCombo = false;
         public int maxStep = 4;
         public float comboStopwatch;
 
+        //primary
+        public int stepCount = 0;
+        public bool isPreCharged;
+
         //private RoR2.BlastAttack bleedblast;
         private GameObject shatterspleenExplode = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/BleedOnHitAndExplode/BleedOnHitAndExplode_Explosion.prefab").WaitForCompletion();
 
+        private RoR2.EntityStateMachine bodyStateMachine;
 
         public void Start()
         {
@@ -52,6 +60,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             characterMotor = GetComponent<RoR2.CharacterMotor>();
             animator = characterBody.modelLocator.modelTransform.GetComponent<Animator>();
             swordTip = characterBody.modelLocator.modelTransform.GetComponent<ChildLocator>().FindChild("SwordTip");
+            RoR2.EntityStateMachine bodyStateMachine = RoR2.EntityStateMachine.FindByCustomName(characterBody.gameObject, "Body");
             AddHooks();
 
         }
@@ -67,7 +76,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
         private void AddHooks()
         {
-            On.RoR2.GlobalEventManager.OnCharacterDeath += GlobalEventManager_OnCharacterDeath;
+            //On.RoR2.GlobalEventManager.OnCharacterDeath += GlobalEventManager_OnCharacterDeath;
         }
 
         public void FixedUpdate()
@@ -76,10 +85,19 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             {
                 distanceToOwner = 8008135f;
             }
+            if (isInCombo)
+            {
+                comboResetTimer += Time.fixedDeltaTime;
+
+                if (comboResetTimer >= comboResetDuration)
+                {
+                    ResetCombo();
+                }
+            }
         }
 
         //In bag range Passive
-        private void GlobalEventManager_OnCharacterDeath(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, RoR2.GlobalEventManager self, RoR2.DamageReport damageReport)
+        /*private void GlobalEventManager_OnCharacterDeath(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, RoR2.GlobalEventManager self, RoR2.DamageReport damageReport)
         {
             //Log.Debug("Triggering OnCharacterDeath");
             if (!damageReport.attacker || damageReport.attacker != gameObject) return;
@@ -100,7 +118,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                 skill.rechargeStopwatch += passiveCooldownReduction;
             }
         }
-        /*private void TriggerBleedBlast()
+        private void TriggerBleedBlast()
         {
             float radius = 6;
             bleedblast = new RoR2.BlastAttack();
@@ -119,7 +137,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             bleedblast.Fire();
 
             CreateShatterspleenExplodeFX(characterBody.corePosition, radius);
-        }*/
+        }
         private void CreateShatterspleenExplodeFX(Vector3 origin, float scale)
         {
             RoR2.EffectData effectData = new RoR2.EffectData();
@@ -127,7 +145,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             effectData.origin = origin;
             effectData.scale = scale;
             RoR2.EffectManager.SpawnEffect(shatterspleenExplode, effectData, false);
-        }
+        }*/
 
 
         public void ResetRopeSkill()
@@ -158,7 +176,30 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             this.characterBody = this.GetComponent<RoR2.CharacterBody>();
             this.skillLocator = this.GetComponent<RoR2.SkillLocator>();
         }
+        public void IncreasePrimaryStepCount()
+        {
+            if (stepCount == 0)
+            {
+                stepCount = 1;
+            }
+            else
+            {
+                stepCount = 0;
+            }
+        }
+        public void PreChargePrimary()
+        {
+            isPreCharged = true;
+        }
+        public void ComboStart()
+        {
+            skillLocator.secondary.SetSkillOverride(this, ConquerorSurvivor.secondaryAxeComboManager, RoR2.GenericSkill.SkillOverridePriority.Replacement);
+        }
+        public void ComboGood()
+        {
+            comboResetTimer = 0f;
 
+        }
         public void IncrementCombo()
         {
             this.comboCount = comboCount + 1;
@@ -168,16 +209,19 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             comboStopwatch = 0f;
             comboCount = 1;
             isInCombo = false;
+            
+            skillLocator.secondary.UnsetSkillOverride(this, ConquerorSurvivor.secondaryAxeComboManager, RoR2.GenericSkill.SkillOverridePriority.Replacement);
 
-            RoR2.GenericSkill utilitySkill = this.skillLocator.utility;
-            if (utilitySkill != null)
+            RoR2.GenericSkill secondarySkill = this.skillLocator.secondary;
+            if (secondarySkill != null)
             {
-                if (utilitySkill.stock > 0)
+                if (secondarySkill.stock > 0)
                 {
-                    utilitySkill.DeductStock(1);
-                    utilitySkill.rechargeStopwatch = 0f;
+                    //secondarySkill.DeductStock(1);
+                    secondarySkill.rechargeStopwatch = 0;
                 }
             }
+            
         }
     }
 }

@@ -104,10 +104,10 @@ namespace ConquerorMod.Modules.BaseStates
             base.OnExit();
         }
 
-        protected virtual void PlaySwingEffect()
-        {
-            EffectManager.SimpleMuzzleFlash(swingEffectPrefab, gameObject, muzzleString, false);
-        }
+        //protected virtual void PlaySwingEffect()
+        //{
+        //    EffectManager.SimpleMuzzleFlash(swingEffectPrefab, gameObject, muzzleString, false);
+        //}
 
         protected virtual void OnHitEnemyAuthority()
         {
@@ -157,7 +157,7 @@ namespace ConquerorMod.Modules.BaseStates
             Util.PlaySound("Play_falseson_skill1_swing", base.gameObject);
             Util.PlaySound("Play_acrid_m1_slash", base.gameObject);
 
-            PlaySwingEffect();
+            //PlaySwingEffect();
 
             if (isAuthority)
             {

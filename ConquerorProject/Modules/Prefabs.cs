@@ -146,7 +146,7 @@ namespace ConquerorMod.Modules
             SetupModelLocator(newBodyPrefab, modelBaseTransform, model.transform);
             SetupCharacterDirection(newBodyPrefab, modelBaseTransform, model.transform);
             SetupCameraTargetParams(newBodyPrefab, bodyInfo);
-            //SetupRigidbody(newPrefab);
+            SetupRigidbody(newBodyPrefab);
             SetupCapsuleCollider(newBodyPrefab);
 
             Modules.Content.AddCharacterBodyPrefab(newBodyPrefab);
@@ -294,11 +294,12 @@ namespace ConquerorMod.Modules
             modelLocator.modelBaseTransform = modelBaseTransform;
         }
 
-        //private static void SetupRigidbody(GameObject prefab)
-        //{
-        //    Rigidbody rigidbody = prefab.GetComponent<Rigidbody>();
-        //    rigidbody.mass = 100f;
-        //}
+        private static void SetupRigidbody(GameObject prefab)
+        {
+            Rigidbody rigidbody = prefab.GetComponent<Rigidbody>();
+            rigidbody.mass
+            = 400f;
+        }
 
         private static void SetupCapsuleCollider(GameObject prefab)
         {

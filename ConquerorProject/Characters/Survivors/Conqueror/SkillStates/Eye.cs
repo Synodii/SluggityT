@@ -24,6 +24,7 @@ using TMPro;
 using static UnityEngine.UI.Image;
 using static R2API.DamageAPI;
 using ConquerorMod.Characters.Survivors.Conqueror.Content;
+using ConquerorMod.Characters.Survivors.Conqueror.Components;
 //using ConquerorMod.Characters.Survivors.Conqueror.Content;
 
 
@@ -214,15 +215,73 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 }
                 else
                 {
-                    //SUCK IT BITCH
                     Util.PlaySound("Play_gup_step", gameObject);
                     Util.PlaySound("Play_imp_overlord_attack1_pop", gameObject);
                     Util.PlaySound("Play_voidDevastator_step", base.gameObject);
                     Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
 
                     CreateShatterspleenImpactFX(body, 7f);
+                    float detectionRadius = 1000f;
+                    float coneAngle = 30f;
 
-                    bleeddetector = new BlastAttack();
+                    Vector3 origin = characterBody.corePosition;
+                    Ray aimRay = base.GetAimRay();
+                    Vector3 direction = aimRay.direction.normalized;
+
+
+                    SphereSearch search = new SphereSearch
+                    {
+                        origin = origin,
+                        radius = detectionRadius,
+                        mask = LayerIndex.entityPrecise.mask,
+                        queryTriggerInteraction = QueryTriggerInteraction.Collide
+                    };
+
+                    List<HurtBox> hurtBoxBuffer = new List<HurtBox>();
+                    search.RefreshCandidates();
+                    search.FilterCandidatesByHurtBoxTeam(TeamMask.GetEnemyTeams(TeamComponent.GetObjectTeam(gameObject)));
+                    search.OrderCandidatesByDistance();
+                    search.FilterCandidatesByDistinctHurtBoxEntities();
+                    search.GetHurtBoxes(hurtBoxBuffer);
+
+                    foreach (HurtBox hurtBox in hurtBoxBuffer)
+                    {
+                        HealthComponent hc = hurtBox.healthComponent;
+                        if (!hc) continue;
+
+                        CharacterBody nmebody = hc.body;
+                        if (!nmebody || nmebody == characterBody) continue;
+
+                        Vector3 toTarget = (nmebody.corePosition - origin).normalized;
+                        float angleToTarget = Vector3.Angle(direction, toTarget);
+
+                        if (angleToTarget <= coneAngle)
+                        {
+                            if (nmebody.isBoss)
+                            {
+                                nmebody.AddBuff(ConquerorBuffs.fallDamageImmune);
+                                nmebody.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
+                                if (!nmebody.GetComponent<FallDamageImmunityTracker>())
+                                {
+                                    nmebody.gameObject.AddComponent<FallDamageImmunityTracker>();
+                                }
+                            }
+                            bool isFlyer = nmebody.isFlying ||
+                                           (nmebody.characterMotor &&
+                                           (nmebody.characterMotor.isFlying || !nmebody.characterMotor.isGrounded));
+
+                            float delay = UnityEngine.Random.Range(0.8f, 1f);
+                            Vector3 targetPosition = body + toTarget * 6f;
+
+                            if (Physics.Raycast(targetPosition + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f, LayerIndex.world.mask))
+                            {
+                                targetPosition = hit.point + Vector3.up * 0.1f;
+                            }
+
+                            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+                            RoR2.Run.instance.StartCoroutine(TeleportandExplodeEnemyAfterDelay(nmebody, targetPosition, delay));
+                        }
+                        /*bleeddetector = new BlastAttack();
                     bleeddetector.radius = 50f;
                     bleeddetector.attacker = gameObject;
                     bleeddetector.inflictor = gameObject;
@@ -242,7 +301,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                         HealthComponent hc = targetsHit.hitPoints[i].hurtBox.healthComponent;
                         CharacterBody nmebody = hc.body;
 
-                        int bleedStacks = 0;
+                        /*int bleedStacks = 0;
                         DotController dotController = DotController.FindDotController(nmebody.gameObject);
                         if (dotController != null)
                         {
@@ -267,7 +326,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                         }
                         else
                         {
-                            Log.Debug($"DOT CONTROLLER IS NULL NOW FOR NO FUCKING REASON");
+                            Log.Debug($"[CONQUEROR EYE] DOTCONTROLLER NULL");
                         }
 
 
@@ -292,18 +351,20 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
                         Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
 
-                        RoR2.Run.instance.StartCoroutine(TeleportandExplodeEnemyAfterDelay(nmebody, targetPosition, delay, bleedStacks));
+                        RoR2.Run.instance.StartCoroutine(TeleportandExplodeEnemyAfterDelay(nmebody, targetPosition, delay));
 
-                        Log.Debug($"Bleedstacks on target hit: {bleedStacks}");
+                        //Log.Debug($"Bleedstacks on target hit: {bleedStacks}");
+                    }*/
+
                     }
                 }
             }
         }
 
-        private IEnumerator TeleportandExplodeEnemyAfterDelay(CharacterBody nmebody, Vector3 targetPosition, float delay, int bleedstacks)
+        private IEnumerator TeleportandExplodeEnemyAfterDelay(CharacterBody nmebody, Vector3 targetPosition, float delay)
         {
-            if (bleedstacks > 0)
-            {
+            //if (bleedstacks > 0)
+            //{
                 CreateTransmitterExploFX(Util.GetCorePosition(nmebody.gameObject));
                 yield return new WaitForSeconds(delay);
 
@@ -322,35 +383,34 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
                 Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
                 this.CreateBlinkFX(Util.GetCorePosition(nmebody.gameObject), Util.GetCorePosition(base.gameObject));
+            //explode
+            //yield return new WaitForSeconds(.5f);
 
-                //explode
-                yield return new WaitForSeconds(.5f);
+            /*if (nmebody != null)
+            {
+                bleedburst = new BlastAttack();
+                bleedburst.radius = 7f;
+                bleedburst.attacker = gameObject;
+                bleedburst.inflictor = gameObject;
+                bleedburst.teamIndex = TeamIndex.Player;
+                bleedburst.procCoefficient = 1f;
+                //eyeblastpull.baseForce = -2000;
+                bleedburst.canRejectForce = false;
+                bleedburst.falloffModel = BlastAttack.FalloffModel.Linear;
+                bleedburst.baseDamage = ConquerorStaticValues.specialeyeDamageCoefficient * damageStat;
+                bleedburst.damageType = DamageType.Generic;
+                bleedburst.crit = RollCrit();
+                bleedburst.position = nmebody.corePosition;
+                bleedburst.Fire();
 
-                if (nmebody != null)
-                {
-                    bleedburst = new BlastAttack();
-                    bleedburst.radius = 7f;
-                    bleedburst.attacker = gameObject;
-                    bleedburst.inflictor = gameObject;
-                    bleedburst.teamIndex = TeamIndex.Player;
-                    bleedburst.procCoefficient = 1f;
-                    //eyeblastpull.baseForce = -2000;
-                    bleedburst.canRejectForce = false;
-                    bleedburst.falloffModel = BlastAttack.FalloffModel.Linear;
-                    bleedburst.baseDamage = ConquerorStaticValues.specialeyeDamageCoefficient * damageStat * bleedstacks;
-                    bleedburst.damageType = DamageType.Generic;
-                    bleedburst.crit = RollCrit();
-                    bleedburst.position = nmebody.corePosition;
-                    bleedburst.Fire();
+                CreateShatterspleenExploFX(Util.GetCorePosition(nmebody));
 
-                    CreateShatterspleenExploFX(Util.GetCorePosition(nmebody));
-
-                    Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
-                    Util.PlaySound("Play_imp_overlord_attack1_pop", nmebody.gameObject);
-                    Util.PlaySound("Play_voidDevastator_step", nmebody.gameObject);
-
-                }
-            }
+                Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+                Util.PlaySound("Play_imp_overlord_attack1_pop", nmebody.gameObject);
+                Util.PlaySound("Play_voidDevastator_step", nmebody.gameObject);
+            */
+            //}
+            //}
         }
 
         public override void OnExit()

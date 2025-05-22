@@ -48,7 +48,7 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.Content
             {
                 if (damageReport.victimBody)
                 {
-                    DotController.InflictDot(damageReport.victim.gameObject, damageReport.attacker, DotController.DotIndex.Bleed, 8f, .5f);
+                    DotController.InflictDot(damageReport.victim.gameObject, damageReport.attacker, DotController.DotIndex.Bleed, 8f, 1f);
                 }
             }
 

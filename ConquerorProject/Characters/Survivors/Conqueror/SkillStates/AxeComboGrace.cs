@@ -15,7 +15,7 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.SkillStates
     {
         private ConquerorController combo;
         private float graceTimer;
-        private float graceDuration = 1.5f;
+        private float graceDuration = 2f;
         private bool inputReceived;
 
         public override void OnEnter()
@@ -31,7 +31,7 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.SkillStates
             base.FixedUpdate();
             graceTimer += Time.fixedDeltaTime;
 
-            if (!inputReceived && inputBank.skill3.down)
+            if (!inputReceived && inputBank.skill2.down)
             {
                 inputReceived = true;
                 AdvanceCombo();
@@ -46,6 +46,7 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.SkillStates
 
         private void AdvanceCombo()
         {
+
             switch (combo.comboCount)
             {
                 case 2:

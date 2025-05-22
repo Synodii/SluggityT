@@ -6,7 +6,7 @@ namespace ConquerorMod.Survivors.Conqueror
     {
         public static void Init()
         {
-            Modules.Content.AddEntityState(typeof(Overpower));
+            Modules.Content.AddEntityState(typeof(OverpowerCharge));
 
             Modules.Content.AddEntityState(typeof(Eye));
 

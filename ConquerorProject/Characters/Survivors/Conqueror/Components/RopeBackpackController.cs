@@ -61,10 +61,13 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             }
             backpackCollider.enabled = true;
             stickComponent.stickEvent.AddListener(OnStickEvent);
+            GlobalEventManager.onCharacterDeathGlobal += OnCharacterDeathGlobal;
+
         }
         void OnStickEvent()
         {
             if (isFlying) return;
+            Log.Debug("Has Stuck");
 
             hasStuck = true;
 
@@ -73,14 +76,17 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             objTracker.characterBody.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             isImmunetoFallDamage = true;
 
+            backpackTargetPos = transform.position;
+
             if (objTracker.distanceToOwner > 10f && objTracker.characterBody && objTracker.characterMotor)
             {
-                Vector3 pullVelocity = GetPullVelocity(transform.position, playerPos, false);
+                Vector3 pullVelocity = GetPullVelocity(backpackTargetPos, playerPos, false);
+                Log.Debug($"Applying PullVelocity: {pullVelocity}");
 
-                Log.Debug(pullVelocity);
+                objTracker.characterMotor.Motor.ForceUnground(0.5f);
+                objTracker.characterMotor.Motor.GroundingStatus = default; // optional
 
                 objTracker.characterMotor.velocity = pullVelocity;
-                objTracker.characterMotor.Motor.ForceUnground(0.5f);
                 objTracker.characterMotor.disableAirControlUntilCollision = true;
             }
         }
@@ -155,11 +161,20 @@ namespace ConquerorMod.Survivors.Conqueror.Components
             
         }
 
+        private void OnCharacterDeathGlobal(DamageReport damageReport)
+        {
+            if (damageReport.victimBody == objTracker.characterBody)
+            {
+                projSimple.lifetime = 0.0001f;
+            }
+        }
+
         private void OnDestroy()
         {
             objTracker.ResetRopeSkill();
             objTracker.characterBody.bodyFlags &= ~CharacterBody.BodyFlags.IgnoreFallDamage;
             isImmunetoFallDamage = false;
+            GlobalEventManager.onCharacterDeathGlobal -= OnCharacterDeathGlobal;
         }
 
         private Vector3 GetPullVelocity(Vector3 targetPos, Vector3 startPos, bool isFlyer)
@@ -181,6 +196,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                 xz.y / timeToTarget
             );
         }
+
 
         private IEnumerator DelayedFlyBack()
         {

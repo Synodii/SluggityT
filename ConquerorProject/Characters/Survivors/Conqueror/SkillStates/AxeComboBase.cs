@@ -31,9 +31,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         public override void OnEnter()
         {
             combo = GetComponent<ConquerorController>();
-
             combo.isInCombo = true;
-
+            combo.ComboGood();
             base.OnEnter();
 
             PlayAnimation();
@@ -60,6 +59,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         protected virtual void DoGroundedAttack()
         {
+            //aimdirection.x... characterDirection.forward.x...
             flatDirection = new Vector3(aimDirection.x, 0f, aimDirection.z);
 
             Util.PlaySound("Play_falseson_skill1_swing", base.gameObject);
@@ -87,14 +87,20 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             groundBlast.crit = RollCrit();
             groundBlast.AddModdedDamageType(DamageTypes.BleedOnHitbutCooler);
             groundBlast.AddModdedDamageType(DamageTypes.ConquerorKnockup);
+            BlastAttack.Result result = groundBlast.Fire();
+            hasFired = true;
+            if (result.hitCount > 0)
+            {
+                combo.PreChargePrimary();
+            }
 
-            groundBlast.Fire();
             characterMotor.velocity = new Vector3(0, 0, 0);
             hasFired = true;
         }
 
         protected virtual void DoAirborneAttack()
         {
+            //aimdirection.x... characterDirection.forward.x...
             flatDirection = new Vector3(aimDirection.x * 20f, 10f, aimDirection.z * 20f);
 
             Util.PlaySound("Play_falseson_skill1_swing", base.gameObject);
@@ -125,7 +131,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                 characterMotor.velocity.x = aimDirection.x * 10f;
                 characterMotor.velocity.z = aimDirection.z * 10f;
             }
-            if (safeguardStopwatch > 5.5f)
+            if (safeguardStopwatch > 5f)
             {
                 hasFired = true;
             }
@@ -163,13 +169,20 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             airBlast.crit = RollCrit();
             airBlast.AddModdedDamageType(DamageTypes.ConquerorKnockup);
             airBlast.Fire();
+            BlastAttack.Result result = airBlast.Fire();
             hasFired = true;
+
+            if (result.hitCount > 0)
+            {
+                combo.PreChargePrimary();
+            }
         }
 
         public override void OnExit()
         {
             characterBody.bodyFlags &= ~CharacterBody.BodyFlags.IgnoreFallDamage;
             combo.IncrementCombo();
+            combo.ComboGood();
             if (combo.comboCount > combo.maxStep)
             {
                 combo.ResetCombo();
@@ -196,6 +209,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         public override void OnEnter()
         {
             base.OnEnter();
+            combo.ComboStart();
             //PlayAnimation("Gesture, Override", "AxeComboVariant1Animation", "AxeCombo.playbackRate", 1f);
         }
         protected override void PlayAnimation()
