@@ -29,7 +29,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             earlyExitPercentTime = .7f;
 
             swingIndex = charge >= 1f ? 1 : 0;
-            damageType = charge >= 1f ? DamageType.BonusToLowHealth : DamageType.Generic;
+            damageType = charge >= 1f ? DamageType.Generic//DamageType.BonusToLowHealth
+                                        : DamageType.Generic;
 
             base.OnEnter();
         }
@@ -45,7 +46,6 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
             float min = ConquerorStaticValues.minPrimaryDamageCoefficient;
             float max = ConquerorStaticValues.maxPrimaryDamageCoefficient;
-
             damageCoefficient = Mathf.Lerp(min, max, charge);
             attack.damage = damageCoefficient * damageStat;
 

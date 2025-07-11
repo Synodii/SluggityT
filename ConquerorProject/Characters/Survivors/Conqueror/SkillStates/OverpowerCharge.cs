@@ -16,7 +16,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         private float overpowerCharge = 0f;
         private float minChargeDuration = .3f;
-        private float baseChargeDuration = 1.7f;
+        private float baseChargeDuration = .8f;
         private float compensatedMinDuration;
         private float compensatedChargeDuration;
         private bool isCharged;
@@ -33,7 +33,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
             this.compensatedChargeDuration = this.baseChargeDuration / this.attackSpeedStat;
             this.compensatedMinDuration = this.minChargeDuration / this.attackSpeedStat;
-            fullChargeHoldPeriod = (compensatedChargeDuration + 1.5f) / this.attackSpeedStat;
+            fullChargeHoldPeriod = (compensatedChargeDuration + 9999f) / this.attackSpeedStat;
             //PlayCrossfade("Gesture, Override", "ChargeLoop", "Swing.playbackRate", 1f, 0.1f);
         }
 
