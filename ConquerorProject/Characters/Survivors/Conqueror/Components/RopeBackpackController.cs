@@ -27,7 +27,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         bool isFlying = false;
         //float distanceToOwner; 
         float autoTriggerDistance = 75;
-        float autoDropDistance = 65;
+        float autoDropDistance = 50;
         float homeToBodyDistance = 50;
         float homingForce = 5f;
         float homingDeceleration = 0.33f;
@@ -78,7 +78,7 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
             backpackTargetPos = transform.position;
 
-            if (objTracker.distanceToOwner > 10f && objTracker.characterBody && objTracker.characterMotor)
+            if (objTracker.distanceToOwner > 18f && objTracker.characterBody && objTracker.characterMotor)
             {
                 Vector3 pullVelocity = GetPullVelocity(backpackTargetPos, playerPos, false);
                 Log.Debug($"Applying PullVelocity: {pullVelocity}");
@@ -163,9 +163,11 @@ namespace ConquerorMod.Survivors.Conqueror.Components
 
         private void OnCharacterDeathGlobal(DamageReport damageReport)
         {
+            if (objTracker == null || objTracker.characterBody == null) return;
+
             if (damageReport.victimBody == objTracker.characterBody)
             {
-                projSimple.lifetime = 0.0001f;
+                Destroy(gameObject);
             }
         }
 

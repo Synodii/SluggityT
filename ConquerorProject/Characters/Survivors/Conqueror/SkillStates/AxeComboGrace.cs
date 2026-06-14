@@ -22,6 +22,13 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.SkillStates
         {
             base.OnEnter();
             combo = characterBody.GetComponent<ConquerorController>();
+
+            if (combo.comboHitSuccess != true ) 
+            {
+                combo.ResetCombo();
+                outer.SetNextStateToMain();
+            }
+
             graceTimer = 0f;
             inputReceived = false;
         }

@@ -41,33 +41,30 @@ namespace ConquerorMod.Survivors.Conqueror
             #endregion
 
             #region Passive
-            Language.Add(prefix + "PASSIVE_NAME", "Scavenge");
-            Language.Add(prefix + "PASSIVE_DESCRIPTION", "While Special is active, kills while within its radius refresh stocks of your secondary.");
+            Language.Add(prefix + "PASSIVE_NAME", "Superbia");
+            Language.Add(prefix + "PASSIVE_DESCRIPTION", "Gain damage reduction exponentially the lower your health is up to 40% at 0 HP.");
             #endregion
 
             #region Primary
-            Language.Add(prefix + "PRIMARY_AXE_NAME", "Overpower");
-            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", $"Swing forward for <style=cIsDamage>{100f}% damage</style>. Every 3rd hit does <style=cIsDamage>{100f}% damage</style> and is <style=cIsDamage>Slayer</style>.");
+            Language.Add(prefix + "PRIMARY_AXE_NAME", "Invidia");
+            Language.Add(prefix + "PRIMARY_AXE_DESCRIPTION", $"Hold to charge a horizontal sweep for 200-500% damage.");
             #endregion
 
             #region Secondary
-            Language.Add(prefix + "SECONDARY_MUNCH_NAME", "Imbibe");
-            Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $" Consume an Imp eye to <style=cIsHealing>heal for 15% max health</style>.  Refreshes 1 Utility stock. Hold up to 3. <style=cIsUtility>Becomes Smother while Special is active.</style>. REMOVE FROM THIS DESC AND MAKE ITS OWN BUT IM TOO LAZY: Crush an imp eye. exploding an area for <style=cIsDamage>{100f * 2}% damage</style>. After a delay, each enemy hit will explode again in a smaller radius for <style=cIsDamage>{100f * 2}% damage</style>. Refreshes 1 Utility stock. Hold up to 3.");
-
-            Language.Add(prefix + "SECONDARY_CRUSH_NAME", "Smother");
-            Language.Add(prefix + "SECONDARY_CRUSH_DESCRIPTION", Tokens.agilePrefix + $"insert token here");
+            Language.Add(prefix + "SECONDARY_AXECOMBO_NAME", "Ira");
+            Language.Add(prefix + "SECONDARY_MUNCH_DESCRIPTION", Tokens.agilePrefix + $"Displacing. Slayer. Slam your axe down for 500%. Successfully hitting an enemy makes your next primary fully charged. Can be reactivated 3 times.");
             #endregion
 
             #region Utility
-            Language.Add(prefix + "UTILITY_WARP_NAME", "Advance");
-            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Charge a teleport. On arrival, deal <style=cIsDamage>{100f * ConquerorStaticValues.warpeyeDamageCoefficient}% damage</style>, <style=cIsHealth>bleeding</style> enemies. At full charge, incur a <style=cIsHealth>25% health cost</style>, <style=cIsUtility>cleanse debuffs</style>, and  <style=cIsHealth>teleport</style> enemies to you. Always charged when Special is active.");
+            Language.Add(prefix + "UTILITY_WARP_NAME", "Gula");
+            Language.Add(prefix + "UTILITY_WARP_DESCRIPTION", $"Bleeding. Crush an imp eye, blinking forward a short distance and dealing 120% damage to all nearby enemies. Hold up to 3. Becomes Luxuria while in range of Special.");
             #endregion
 
             #region Special
-            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_NAME", "Conquest");
-            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_DESCRIPTION", $"Deploy your backpack. Allies near it are Bolstered, while enemies are Disheartened. Leave its radius or reactivate to reclaim it.");
+            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_NAME", "Acedia");
+            Language.Add(prefix + "SPECIAL_ROPEBACKPACK_DESCRIPTION", $"Hold to charge. Throw your backpack, creating an encampment and pulling yourself to where it lands. While inside the radius of your encampment, gain 30 armor.");
 
-            Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_NAME", "Conquest");
+            Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_NAME", "Acedia");
             Language.Add(prefix + "SPECIAL_RECALLROPEBACKPACK_DESCRIPTION", Tokens.stunningPrefix +  $"Recall your backpack.");
             #endregion
 

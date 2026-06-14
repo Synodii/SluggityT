@@ -113,6 +113,10 @@ namespace ConquerorMod.Modules.BaseStates
         {
             Util.PlaySound("Play_chef_skill1_return", base.gameObject); 
             Util.PlaySound("Play_bellBody_attackLand", base.gameObject);
+            Util.PlaySound("Play_void_devastator_step", base.gameObject); 
+            Util.PlaySound("Play_bellBody_attackLand", base.gameObject);
+            Util.PlaySound("Play_void_devastator_step", base.gameObject);
+
 
             if (!hasHopped)
             {

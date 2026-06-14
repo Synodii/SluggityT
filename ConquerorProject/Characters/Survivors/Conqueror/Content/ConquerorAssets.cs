@@ -116,6 +116,11 @@ namespace ConquerorMod.Survivors.Conqueror
             ropePack.buffward = bW1;
             ropePack.ropeIndicator = ropeIndicator;
         }
+
+        private static void CreateEyeProjectile()
+        {
+            Asset.CloneProjectilePrefab("CommandoGrenadeProjectile", "ConquerorRopeWardProjectile");
+        }
         #endregion projectiles
     }
 }

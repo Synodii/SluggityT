@@ -44,20 +44,27 @@ namespace ConquerorMod.Survivors.Conqueror.Components
         public bool isInCombo = false;
         public int maxStep = 4;
         public float comboStopwatch;
+        public bool comboHitSuccess;
 
         //primary
         public int stepCount = 0;
         public bool isPreCharged;
+        public bool preChargeEffectComplete;
 
         //private RoR2.BlastAttack bleedblast;
         private GameObject shatterspleenExplode = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/BleedOnHitAndExplode/BleedOnHitAndExplode_Explosion.prefab").WaitForCompletion();
+        private GameObject shatterspleenImpact = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/BleedOnHitAndExplode/BleedOnHitAndExplode_Impact.prefab").WaitForCompletion();
+
 
         private RoR2.EntityStateMachine bodyStateMachine;
+
+        public ClimbCharacterMotor climbMotor;
 
         public void Start()
         {
             characterBody = GetComponent<RoR2.CharacterBody>();
             characterMotor = GetComponent<RoR2.CharacterMotor>();
+            climbMotor = characterMotor as ClimbCharacterMotor;
             animator = characterBody.modelLocator.modelTransform.GetComponent<Animator>();
             swordTip = characterBody.modelLocator.modelTransform.GetComponent<ChildLocator>().FindChild("SwordTip");
             RoR2.EntityStateMachine bodyStateMachine = RoR2.EntityStateMachine.FindByCustomName(characterBody.gameObject, "Body");
@@ -94,6 +101,22 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                     ResetCombo();
                 }
             }
+            if (isPreCharged && !preChargeEffectComplete)
+            {
+                preChargeEffectComplete = true;
+                RoR2.Util.PlaySound("Play_voidman_sprint_start", base.gameObject);
+                CreateShatterspleenImpactFX(RoR2.Util.GetCorePosition(this.characterBody.gameObject));
+
+            }
+        }
+
+        private void CreateShatterspleenImpactFX(Vector3 origin)
+        {
+            RoR2.EffectData effectData = new RoR2.EffectData();
+            //effectData.rotation = Util.QuaternionSafeLookRotation(forwardDirection);
+            effectData.origin = origin;
+            effectData.scale = 8f;
+            RoR2.EffectManager.SpawnEffect(shatterspleenImpact, effectData, false);
         }
 
         //In bag range Passive
@@ -187,22 +210,30 @@ namespace ConquerorMod.Survivors.Conqueror.Components
                 stepCount = 0;
             }
         }
-        public void PreChargePrimary()
+        public void ComboHasHitSequence()
         {
             isPreCharged = true;
+            comboHitSuccess = true;
         }
         public void ComboStart()
         {
             skillLocator.secondary.SetSkillOverride(this, ConquerorSurvivor.secondaryAxeComboManager, RoR2.GenericSkill.SkillOverridePriority.Replacement);
         }
-        public void ComboGood()
+        public void ResetComboTimer()
         {
             comboResetTimer = 0f;
 
         }
         public void IncrementCombo()
         {
+            //if (comboHitSuccess)
+            //{
+            //    this.comboCount = comboCount + 1;
+            //}
+            //else { ResetCombo(); }
+
             this.comboCount = comboCount + 1;
+
         }
         public void ResetCombo()
         {

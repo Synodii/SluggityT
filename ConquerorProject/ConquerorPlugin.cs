@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using ConquerorMod.Survivors.Conqueror;
+using ConquerorMod.Survivors.Conqueror.Components;
 using R2API.Utils;
 using RoR2;
 using System.Collections.Generic;
@@ -41,6 +42,8 @@ namespace ConquerorMod
 
             // used when you want to properly set up language folders
             Modules.Language.Init();
+
+            _ = CameraModeWallClimb.playerBasic;
 
             // character initialization
             new ConquerorSurvivor().Initialize();

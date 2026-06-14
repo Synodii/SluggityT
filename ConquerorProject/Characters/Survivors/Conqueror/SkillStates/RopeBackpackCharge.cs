@@ -8,7 +8,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
     public class RopeBackpackCharge : BaseSkillState
     {
         private float charge;
-        private float baseChargeDuration = 4f;
+        private float baseChargeDuration = 2f;
         private float compensatedChargeDuration;
         private bool isCharged;
 
@@ -25,16 +25,13 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         public override void FixedUpdate()
         {
-            base.FixedUpdate();
+            charge += Time.fixedDeltaTime;
 
-            if (charge < 1f)
-            {
-                charge += Time.fixedDeltaTime / compensatedChargeDuration;
-            }
-            if (charge  > compensatedChargeDuration && !isCharged) 
+            if (charge >= compensatedChargeDuration && !isCharged)
             {
                 Util.PlaySound("Play_voidman_sprint_start", base.gameObject);
                 CreateShatterspleenImpactFX(Util.GetCorePosition(this.characterBody.gameObject));
+                Log.Debug("Ropebackpack Charge IsCharged");
                 isCharged = true;
             }
 

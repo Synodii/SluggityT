@@ -32,7 +32,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             combo = GetComponent<ConquerorController>();
             combo.isInCombo = true;
-            combo.ComboGood();
+            combo.ResetComboTimer();
             base.OnEnter();
 
             PlayAnimation();
@@ -52,6 +52,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         protected virtual void ComboPrep()
         {
             combo.comboStopwatch = 0f;
+            combo.comboHitSuccess = false;
             realDelay = delay / attackSpeedStat;
             isAirborneAttack = !characterMotor.isGrounded;
             aimDirection = GetAimRay().direction;
@@ -85,13 +86,13 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             groundBlast.radius = 7f;
             groundBlast.teamIndex = TeamComponent.GetObjectTeam(gameObject);
             groundBlast.crit = RollCrit();
-            groundBlast.AddModdedDamageType(DamageTypes.BleedOnHitbutCooler);
+            groundBlast.damageType = DamageType.BonusToLowHealth | DamageType.Stun1s;
             groundBlast.AddModdedDamageType(DamageTypes.ConquerorKnockup);
             BlastAttack.Result result = groundBlast.Fire();
             hasFired = true;
             if (result.hitCount > 0)
             {
-                combo.PreChargePrimary();
+                combo.ComboHasHitSequence();
             }
 
             characterMotor.velocity = new Vector3(0, 0, 0);
@@ -135,15 +136,15 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             {
                 hasFired = true;
             }
-            if (isAirborneAttack && characterMotor.isGrounded)
+            if (isAirborneAttack && characterMotor.isGrounded && heheFallinTime)
             {
-                FireAirSlam();
                 heheFallinTime = false;
+                FireAirSlam();
             }
             if (hasFired)
             {
                 Util.PlaySound("Play_loader_R_variant_slam", base.gameObject);
-                
+
                 var graceState = new AxeComboGrace();
                 outer.SetNextState(graceState);
                 if (combo.comboCount >= 4)
@@ -167,6 +168,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             airBlast.radius = 8f;
             airBlast.teamIndex = TeamComponent.GetObjectTeam(gameObject);
             airBlast.crit = RollCrit();
+            airBlast.damageType = DamageType.BonusToLowHealth | DamageType.Stun1s;
             airBlast.AddModdedDamageType(DamageTypes.ConquerorKnockup);
             airBlast.Fire();
             BlastAttack.Result result = airBlast.Fire();
@@ -174,7 +176,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
             if (result.hitCount > 0)
             {
-                combo.PreChargePrimary();
+                combo.ComboHasHitSequence();
             }
         }
 
@@ -182,7 +184,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             characterBody.bodyFlags &= ~CharacterBody.BodyFlags.IgnoreFallDamage;
             combo.IncrementCombo();
-            combo.ComboGood();
+            combo.ResetComboTimer();
             if (combo.comboCount > combo.maxStep)
             {
                 combo.ResetCombo();

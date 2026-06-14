@@ -5,17 +5,11 @@ namespace ConquerorMod.Survivors.Conqueror
 {
     public static class ConquerorBuffs
     {
-        //public static BuffDef satiatedBuff;
-        public static BuffDef fallDamageImmune;
-        public static BuffDef bolsteredBuff;
-        //public static BuffDef conqExecutionMark;
+        public static BuffDef conquerorIntimidateDebuff;
 
         static ConquerorBuffs()
         {
-            fallDamageImmune = AddNewBuff("ConquerorFallDamageImmune", LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite, Color.magenta, canStack: false, isDebuff: false, isHidden: true);
-            bolsteredBuff = AddNewBuff("ConquerorBolsteredBuff", LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite, Color.blue, canStack: false, isDebuff: false);
-            //disheartenedDebuff = AddNewBuff("ConquerorDishearteneddBuff", LegacyResourcesAPI.Load<BuffDef>("BuffDefs/HiddenInvincibility").iconSprite, Color.green, canStack: false, isDebuff: true);
-            //conqExecutionMark = AddNewBuff("ConquerorExecuteHiddenBuff", LegacyResourcesAPI.Load<BuffDef>(null).iconSprite, Color.green, canStack: false, isDebuff: false, isHidden: true);
+            conquerorIntimidateDebuff = AddNewBuff("ConquerorIntimidatedDebuff", LegacyResourcesAPI.Load<BuffDef>(null).iconSprite, Color.green, canStack: false, isDebuff: true, isHidden: false);
         }
 
         private static BuffDef AddNewBuff(string buffName, Sprite icon, Color color, bool canStack, bool isDebuff, bool isHidden = false, bool isCooldown = false)

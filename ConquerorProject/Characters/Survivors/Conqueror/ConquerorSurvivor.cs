@@ -381,8 +381,8 @@ namespace ConquerorMod.Survivors.Conqueror
                 activationStateMachineName = "Weapon4",
                 interruptPriority = EntityStates.InterruptPriority.PrioritySkill,
 
-                baseRechargeInterval = 6f,
-                baseMaxStock = 3,
+                baseRechargeInterval = 7f,
+                baseMaxStock = 2,
 
                 rechargeStock = 1,
                 requiredStock = 1,
@@ -447,13 +447,13 @@ namespace ConquerorMod.Survivors.Conqueror
                 skillDescriptionToken = CONQUEROR_PREFIX + "SPECIAL_ROPEBACKPACK_DESCRIPTION",
                 skillIcon = assetBundle.LoadAsset<Sprite>("texSpecialIcon"),
 
-                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.RopeBackpackCharge)),
+                activationState = new EntityStates.SerializableEntityStateType(typeof(SkillStates.RopeBackpackFire)),
                 //setting this to the "weapon2" EntityStateMachine allows us to cast this skill at the same time primary, which is set to the "weapon" EntityStateMachine
                 activationStateMachineName = "Weapon2",
                 interruptPriority = EntityStates.InterruptPriority.Skill,
 
                 baseMaxStock = 1,
-                baseRechargeInterval = 10f,
+                baseRechargeInterval = 6f,
 
                 isCombatSkill = false,
                 beginSkillCooldownOnSkillEnd = true,
@@ -647,9 +647,11 @@ namespace ConquerorMod.Survivors.Conqueror
                 //}
             }*/
 
-            if (sender.HasBuff(ConquerorBuffs.bolsteredBuff))
+            if (sender.HasBuff(ConquerorBuffs.conquerorIntimidateDebuff))
             {
-                args.armorAdd += 30;
+                args.armorAdd += -25;
+                args.moveSpeedReductionMultAdd += 15;
+                args.baseDamageAdd += -25;
             }
         }
     }

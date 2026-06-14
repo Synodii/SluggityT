@@ -45,10 +45,6 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             base.ModifyProjectileInfo(ref fireProjectileInfo);
 
-            float clampedCharge = Mathf.Clamp01(charge);
-            float minSpeed = 4f;
-            float maxSpeed = 60f;
-
 
             //Ray aimRay;
 
@@ -58,10 +54,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
             fireProjectileInfo.position = spawnPos;
             fireProjectileInfo.rotation = Quaternion.LookRotation(aimDirection);
-            fireProjectileInfo.speedOverride = Mathf.Lerp(minSpeed, maxSpeed, clampedCharge);
+            fireProjectileInfo.speedOverride = 30;
             fireProjectileInfo.damageTypeOverride = DamageTypeCombo.GenericSpecial;
-
-            Log.Debug($"SpawnPos CharBody.coreposition + that fucking thing= = {spawnPos}");
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()

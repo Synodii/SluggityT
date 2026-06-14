@@ -12,12 +12,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
     {
         private ConquerorController controller;
 
-        private float charge;
-
-        public OverpowerFire(float overpowerCharge)
-        {
-            this.charge = overpowerCharge;
-        }
+        int step;
 
         public override void OnEnter()
         {
@@ -80,8 +75,14 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         public override void OnExit()
         {
-            controller.IncreasePrimaryStepCount();
+            if (isMaxCharge)
+            {
+                controller.IncreasePrimaryStepCount();
+            }
+
+            isMaxCharge = false;
             controller.isPreCharged = false;
+            controller.preChargeEffectComplete = false;
             
             base.OnExit();
         }

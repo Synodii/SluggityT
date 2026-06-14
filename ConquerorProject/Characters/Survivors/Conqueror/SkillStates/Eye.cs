@@ -33,7 +33,8 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
     public class Eye : BaseSkillState
     {
         public static float baseDuration = .5f;
-        public static float firePercentTime = 1f;
+        public static float baseFireTime = .5f;
+
         private float duration;
         private float fireTime;
         private bool hasFired;
@@ -84,7 +85,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
             characterBody.GetComponent<ConquerorController>().isUsingMunch = true;
 
             duration = baseDuration / attackSpeedStat;
-            fireTime = firePercentTime * duration;
+            fireTime = baseFireTime / attackSpeedStat;
             characterBody.SetAimTimer(2f);
             muzzleString = "Muzzle";
             hasFired = false;
@@ -221,8 +222,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     Util.PlaySound("Play_nullifier_attack1_summon", gameObject);
 
                     CreateShatterspleenImpactFX(body, 7f);
-                    float detectionRadius = 1000f;
-                    float coneAngle = 30f;
+                    float detectionRadius = 13f;
 
                     Vector3 origin = characterBody.corePosition;
                     Ray aimRay = base.GetAimRay();
@@ -243,7 +243,6 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     search.OrderCandidatesByDistance();
                     search.FilterCandidatesByDistinctHurtBoxEntities();
                     search.GetHurtBoxes(hurtBoxBuffer);
-
                     foreach (HurtBox hurtBox in hurtBoxBuffer)
                     {
                         HealthComponent hc = hurtBox.healthComponent;
@@ -255,32 +254,30 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                         Vector3 toTarget = (nmebody.corePosition - origin).normalized;
                         float angleToTarget = Vector3.Angle(direction, toTarget);
 
-                        if (angleToTarget <= coneAngle)
+                        if (nmebody.isBoss)
                         {
-                            if (nmebody.isBoss)
+                            nmebody.AddBuff(ConquerorBuffs.fallDamageImmune);
+                            nmebody.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
+                            if (!nmebody.GetComponent<FallDamageImmunityTracker>())
                             {
-                                nmebody.AddBuff(ConquerorBuffs.fallDamageImmune);
-                                nmebody.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
-                                if (!nmebody.GetComponent<FallDamageImmunityTracker>())
-                                {
-                                    nmebody.gameObject.AddComponent<FallDamageImmunityTracker>();
-                                }
+                                nmebody.gameObject.AddComponent<FallDamageImmunityTracker>();
                             }
-                            bool isFlyer = nmebody.isFlying ||
-                                           (nmebody.characterMotor &&
-                                           (nmebody.characterMotor.isFlying || !nmebody.characterMotor.isGrounded));
-
-                            float delay = UnityEngine.Random.Range(0.8f, 1f);
-                            Vector3 targetPosition = body + toTarget * 6f;
-
-                            if (Physics.Raycast(targetPosition + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f, LayerIndex.world.mask))
-                            {
-                                targetPosition = hit.point + Vector3.up * 0.1f;
-                            }
-
-                            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
-                            RoR2.Run.instance.StartCoroutine(TeleportandExplodeEnemyAfterDelay(nmebody, targetPosition, delay));
                         }
+                        bool isFlyer = nmebody.isFlying ||
+                                       (nmebody.characterMotor &&
+                                       (nmebody.characterMotor.isFlying || !nmebody.characterMotor.isGrounded));
+
+                        float delay = UnityEngine.Random.Range(0.8f, 1f);
+                        Vector3 targetPosition = body + toTarget * 6f;
+
+                        if (Physics.Raycast(targetPosition + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f, LayerIndex.world.mask))
+                        {
+                            targetPosition = hit.point + Vector3.up * 0.1f;
+                        }
+
+                        Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+                        RoR2.Run.instance.StartCoroutine(TeleportandExplodeEnemyAfterDelay(nmebody, targetPosition, delay));
+
                         /*bleeddetector = new BlastAttack();
                     bleeddetector.radius = 50f;
                     bleeddetector.attacker = gameObject;
@@ -365,24 +362,24 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
         {
             //if (bleedstacks > 0)
             //{
-                CreateTransmitterExploFX(Util.GetCorePosition(nmebody.gameObject));
-                yield return new WaitForSeconds(delay);
+            CreateTransmitterExploFX(Util.GetCorePosition(nmebody.gameObject));
+            yield return new WaitForSeconds(delay);
 
-                //teleport
-                if (nmebody && nmebody.characterMotor)
-                {
-                    nmebody.characterMotor.Motor.SetPosition(targetPosition);
-                    nmebody.characterMotor.velocity = Vector3.zero;
-                    nmebody.characterMotor.Motor.ForceUnground(0.1f);
-                    SmallHop(nmebody.characterMotor, 3f);
-                }
-                else if (nmebody && nmebody.transform)
-                {
-                    nmebody.transform.position = targetPosition;
-                }
+            //teleport
+            if (nmebody && nmebody.characterMotor)
+            {
+                nmebody.characterMotor.Motor.SetPosition(targetPosition);
+                nmebody.characterMotor.velocity = Vector3.zero;
+                nmebody.characterMotor.Motor.ForceUnground(0.1f);
+                SmallHop(nmebody.characterMotor, 3f);
+            }
+            else if (nmebody && nmebody.transform)
+            {
+                nmebody.transform.position = targetPosition;
+            }
 
-                Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
-                this.CreateBlinkFX(Util.GetCorePosition(nmebody.gameObject), Util.GetCorePosition(base.gameObject));
+            Util.PlaySound("Play_voidDevastator_m2_secondary_explo", nmebody.gameObject);
+            this.CreateBlinkFX(Util.GetCorePosition(nmebody.gameObject), Util.GetCorePosition(base.gameObject));
             //explode
             //yield return new WaitForSeconds(.5f);
 

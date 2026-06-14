@@ -16,7 +16,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
 
         private float overpowerCharge = 0f;
         private float minChargeDuration = .3f;
-        private float baseChargeDuration = .8f;
+        private float baseChargeDuration = .75f;
         private float compensatedMinDuration;
         private float compensatedChargeDuration;
         private bool isCharged;
@@ -55,7 +55,7 @@ namespace ConquerorMod.Survivors.Conqueror.SkillStates
                     overpowerCharge = 1f;
                 }
 
-                if (overpowerCharge >= 1f && !isCharged)
+                if (overpowerCharge >= 1f && !isCharged && !controller.isPreCharged)
                 {
                     Util.PlaySound("Play_voidman_sprint_start", base.gameObject);
                     isCharged = true;

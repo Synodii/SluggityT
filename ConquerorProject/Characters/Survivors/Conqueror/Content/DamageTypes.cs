@@ -48,7 +48,7 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.Content
             {
                 if (damageReport.victimBody)
                 {
-                    DotController.InflictDot(damageReport.victim.gameObject, damageReport.attacker, DotController.DotIndex.Bleed, 8f, 1f);
+                    DotController.InflictDot(damageReport.victim.gameObject, damageReport.attacker, null, DotController.DotIndex.Bleed, 8f, 1f);
                 }
             }
 
@@ -58,8 +58,8 @@ namespace ConquerorMod.Characters.Survivors.Conqueror.Content
                 //apply knockup scaled with mass if victim has rigidbody. Do not apply knockup if victim is airborne.
                 if (damageReport.victim.body && damageReport.victim.body.characterMotor)
                 {
-                    damageReport.damageInfo.force = damageReport.victimBody.characterMotor.isGrounded ? (damageReport.victimBody.rigidbody && damageReport.victimBody.rigidbody.mass < 700 ? damageReport.victimBody.rigidbody.mass : 0.1f) * new Vector3(0, 15f, 0) : Vector3.zero;
-                    
+                    damageReport.damageInfo.force = damageReport.victimBody.characterMotor.isGrounded ? (damageReport.victimBody.rigidbody && damageReport.victimBody.rigidbody.mass < 700 ? damageReport.victimBody.rigidbody.mass : 0.1f) * new Vector3(0, 6f, 0) : Vector3.zero;
+
                     if (damageReport.victim.body.characterMotor.isGrounded) damageReport.victim.body.characterMotor.Motor.ForceUnground();
                     damageReport.victim?.TakeDamageForce(damageReport.damageInfo.force);
 
